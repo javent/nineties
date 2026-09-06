@@ -1,7 +1,6 @@
 /*
- * Pastel shader stage + the inside-the-fridge field.
- * The scene is intentionally colorful, so chrome UI uses ink-dark glass panels
- * rather than the low-contrast white-on-black treatment of the original viewer.
+ * Inside-the-fridge field portal plus the minimal black exterior chrome.
+ * The final exterior pass below intentionally removes all header/footer fills.
  */
 :root {
   --stage-ink: #17152d;
@@ -572,4 +571,111 @@ body.portal-active #world:active {
   #home .brand-wordmark {
     width: 85px;
   }
+}
+
+/* Readable 1990s terminal chrome: white type, mono labels, zero header/footer fill. */
+.topbar,
+.bottom-bar {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.topbar nav,
+.collection-trigger,
+.story-trigger,
+.finish-picker,
+.bottom-bar,
+.handle-hint {
+  font-family: "IBM Plex Mono", monospace;
+}
+.collection-trigger,
+.story-trigger,
+.count,
+.finish-caption,
+#finish-name,
+.gesture-guide,
+.gesture-guide b,
+.sound-toggle,
+.gesture-guide .icon,
+.sound-toggle .icon {
+  color: #fff !important;
+  text-shadow: none;
+}
+.collection-trigger,
+.sound-toggle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.collection-trigger {
+  gap: 8px;
+  padding: 9px 0;
+}
+.collection-trigger > .icon {
+  display: none;
+}
+.count {
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.count::before {
+  content: "/";
+  padding-right: 7px;
+  color: #fff;
+}
+.story-trigger {
+  width: 28px;
+  height: 28px;
+  border-radius: 0;
+}
+.story-trigger .icon {
+  width: 16px;
+  height: 16px;
+}
+.icon-button:hover {
+  background: transparent !important;
+  color: #fff !important;
+}
+.finish-picker {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.finish-caption,
+#finish-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.swatch.selected {
+  border-color: #fff;
+}
+.gesture-guide {
+  gap: 16px;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+}
+.gesture-guide b {
+  font-weight: 600;
+}
+.gesture-guide i,
+.sound-led {
+  background: #fff !important;
+}
+.sound-toggle {
+  gap: 8px;
+  padding: 9px 0 9px 9px;
+}
+#home .brand-wordmark text {
+  font-family: "Sticker Heavy", "IBM Plex Mono", sans-serif;
+}
+
+:root {
+  --stage-ink: #fff;
+  --stage-ink-soft: #fff;
 }

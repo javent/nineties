@@ -2,7 +2,7 @@
 
 ### A minimal, centered sticker playground.
 
-An interactive Three.js refrigerator and thirty-nine reference-led skate and band stickers on a pure black, minimal stage. Hover the chrome handle to wake its neon glow, then click it to open a Windows 95 field with a modeled SURGE vending machine waiting in the distance. The fridge, hardware, printed paper, field, and vending machine remain real-time 3D. The interface uses high-contrast DM Sans typography and a wood-lined collection drawer, with the requested Revue font reserved for the top-left wordmark.
+An interactive Three.js refrigerator and thirty-nine reference-led skate and band stickers on a pure black, minimal stage. Hover the chrome handle to wake its neon glow, then click it to open a Windows 95 field with a modeled SURGE vending machine waiting in the distance. The fridge, hardware, printed paper, field, and vending machine remain real-time 3D. The interface uses high-contrast DM Sans typography and a wood-lined collection drawer, with a compact 1990s XP wordmark using Sticker Heavy and IBM Plex Mono navigation.
 
 ## Run it
 

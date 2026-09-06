@@ -442,6 +442,8 @@ async function init() {
       '400 16px "DM Sans"',
       '500 24px "DM Sans"',
       '700 24px "DM Sans"',
+      '900 32px "Sticker Heavy"',
+      '400 32px "Sticker Marker"',
     ].map((f) => document.fonts.load(f)),
   ).catch(() => {});
   const [maps] = await Promise.all([makeEnamelTextures(), fonts]);
