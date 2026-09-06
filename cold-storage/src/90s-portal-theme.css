@@ -425,3 +425,151 @@ body.portal-active #world:active {
     transition: none;
   }
 }
+
+/* Minimal exterior pass: black stage, no glass cards, no opaque chrome. */
+:root {
+  --stage-ink: #f2f2ee;
+  --stage-ink-soft: #aaa9a9;
+  --stage-line: transparent;
+  --stage-panel: transparent;
+  --stage-accent: #f2f2ee;
+}
+
+.topbar {
+  border-bottom: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+#home.brand {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--stage-ink);
+  text-shadow: none;
+}
+#home.brand:hover {
+  color: #fff;
+  background: transparent;
+}
+#home .brand-wordmark {
+  width: 156px;
+  filter: none;
+}
+
+.collection-trigger,
+.story-trigger {
+  color: var(--stage-ink-soft);
+  text-shadow: none;
+}
+.collection-trigger:hover,
+.story-trigger:hover {
+  color: var(--stage-ink);
+}
+.count {
+  width: auto;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #8e8d8f;
+  font-weight: 400;
+}
+.icon-button:hover {
+  color: var(--stage-ink);
+  background: transparent;
+}
+
+.finish-picker {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.finish-caption,
+#finish-name {
+  color: #8e8d8f;
+  text-shadow: none;
+}
+.swatch.selected {
+  border-color: #f2f2ee;
+  box-shadow: none;
+}
+.swatch:hover,
+.swatch.selected:hover {
+  border-color: #f2f2ee;
+}
+
+.bottom-bar {
+  border-top: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.gesture-guide,
+.sound-toggle {
+  color: #8e8d8f;
+  text-shadow: none;
+}
+.gesture-guide b {
+  color: #d0cfd0;
+  font-weight: 500;
+}
+.gesture-guide .icon,
+.sound-toggle .icon {
+  color: #b8b7b8;
+}
+.gesture-guide i {
+  background: #69686b;
+}
+
+.handle-hint {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #f2f2ee;
+  text-shadow: 0 1px 8px #000;
+}
+.handle-hint .icon {
+  color: #f2f2ee;
+}
+
+@media (max-width: 800px) {
+  .topbar {
+    background: transparent;
+  }
+  #home.brand {
+    padding: 0;
+  }
+  #home .brand-wordmark {
+    width: 107px;
+  }
+  .finish-picker {
+    width: auto;
+    padding: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  #home .brand-wordmark {
+    width: 97px;
+  }
+  .finish-picker {
+    width: auto;
+  }
+}
+
+@media (max-width: 380px) {
+  #home .brand-wordmark {
+    width: 85px;
+  }
+}

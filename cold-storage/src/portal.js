@@ -365,7 +365,7 @@ export function createPortal(app, fridge, stickers) {
     group.visible = false;
     restoreFridge();
     app.scene.background = new THREE.Color(0x000000);
-    app.backdrop.visible = true;
+    app.backdrop.visible = false;
     app.setMode("fridge");
     app.renderer.shadowMap.autoUpdate = false;
     app.renderer.shadowMap.needsUpdate = true;

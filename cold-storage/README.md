@@ -2,7 +2,7 @@
 
 ### A minimal, centered sticker playground.
 
-An interactive Three.js refrigerator and thirty-nine reference-led skate and band stickers on an animated pastel 90s shader stage. Hover the chrome handle to wake its neon glow, then click it to open a Windows 95 field with a modeled SURGE vending machine waiting in the distance. The fridge, hardware, printed paper, field, and vending machine remain real-time 3D. The interface uses high-contrast DM Sans typography and a wood-lined collection drawer, with the requested Revue font reserved for the top-left wordmark.
+An interactive Three.js refrigerator and thirty-nine reference-led skate and band stickers on a pure black, minimal stage. Hover the chrome handle to wake its neon glow, then click it to open a Windows 95 field with a modeled SURGE vending machine waiting in the distance. The fridge, hardware, printed paper, field, and vending machine remain real-time 3D. The interface uses high-contrast DM Sans typography and a wood-lined collection drawer, with the requested Revue font reserved for the top-left wordmark.
 
 ## Run it
 
@@ -50,7 +50,7 @@ Additional controls: three enamel finishes (Buttermilk, Sea glass, and Hunter gr
 
 | File                                     | Responsibility                                                                                  |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `src/scene.js`                           | Renderer, animated pastel shader backdrop, camera, and damped OrbitControls                    |
+| `src/scene.js`                           | Renderer, black exterior stage, camera, and damped OrbitControls                    |
 | `src/portal.js`                          | Windows 95 field, 3D SURGE vending machine, field navigation, and portal state                 |
 | `src/lighting.js`                        | Warm key, fill/rim lights, real HDRI + procedural fallback                                      |
 | `src/textures.js`                        | Downloaded PBR maps, procedural micrograin/scuffs/fingerprint roughness                         |
@@ -116,7 +116,7 @@ For Buttermilk and Sea glass, `fridge.js` uses metalness `0.67`, clearcoat `0.48
 
 ### 2. HDRI
 
-Bundled: [Poly Haven — Studio Small 09](https://polyhaven.com/a/studio_small_09), **1K HDR**, by Sergej Majboroda, CC0. It is prefiltered with PMREM for chrome, enamel, and adhesive reflections. The HDRI affects reflections only; the visible exterior is the animated shader backdrop and the interior uses the field portal.
+Bundled: [Poly Haven — Studio Small 09](https://polyhaven.com/a/studio_small_09), **1K HDR**, by Sergej Majboroda, CC0. It is prefiltered with PMREM for chrome, enamel, and adhesive reflections. The HDRI affects reflections only; the visible exterior is pure black and the interior uses the field portal.
 
 To change the room, choose a garage, workshop, kitchen, or soft studio environment from [Poly Haven HDRIs](https://polyhaven.com/hdris), add its `.hdr` to `public/assets`, and change the `asset(...)` filename in `lighting.js`. A 1K–2K HDR is a good web compromise. A procedural `RoomEnvironment` remains available if the HDR cannot load.
 
@@ -213,9 +213,9 @@ The existing 24 stickers keep their placements. The new band graphics start **in
 - **Already placed:** dragging its card moves the existing sticker—it does not create a duplicate. Placed stickers have a small checkmark in the drawer.
 - **Invalid drop / cancellation:** an unplaced sticker returns to the drawer; an already-placed sticker returns to its prior position. No informational toast is shown.
 
-### Shader stage, handle affordance, and field portal
+### Minimal black stage, handle affordance, and field portal
 
-The fridge now sits in a procedural pastel shader stage inspired by the supplied abstract 90s reference. The stage uses animated warped color ribbons, soft grain, and a dark plum edge falloff, while the header, wordmark, finish picker, icons, and footer use ink-dark glass treatments for reliable contrast.
+The exterior now uses a pure black stage with no opaque navigation cards or glass containers. The smaller 1990s XP wordmark and surrounding navigation use quiet light-gray ink, while the handle remains a bright neon affordance on hover.
 
 The chrome handle is a first-class raycast target. Hovering changes its chrome color, adds emissive magenta light, enables a larger additive glow tube, and reveals an “Open the fridge” hint. Clicking swaps to a second Three.js mode: the supplied field image becomes the Windows desktop-style horizon, a green 3D SURGE machine is assembled from rounded cabinet parts, textured graphics, payment hardware, an extruded can, a turquoise pallet, and the supplied vending-machine photo as a small side decal. The portal has relaxed orbit bounds, scroll dolly navigation, a distance readout, and Esc / Back to fridge controls.
 
@@ -235,7 +235,7 @@ Saved format version 3 adds the `placed` Boolean. Older stored stickers without 
 
 ## Minimal art direction
 
-- **Background:** the fridge uses a custom animated GLSL pastel shader backdrop. The inside state uses the supplied `field.jpg` horizon and a navigable field plane; the portal's bright wallpaper and UI panels are kept readable with navy ink and translucent light glass.
+- **Background:** the exterior fridge view is exact black with no room scenery, floor, horizon, or opaque UI containers. The inside state uses the supplied `field.jpg` horizon and a navigable field plane; the portal's bright wallpaper and UI panels use navy ink for contrast.
 - **Typography:** interface labels, menus, dialogs and export labels use **DM Sans**. Only the top-left `Mid90s Minifridge` wordmark uses the requested **Revue Regular**, from the user-specified Font.Download page, rendered as a responsive inline SVG using the actual font outlines and HarfBuzz shaping. No global font-family change is made. The vintage appliance badge and sticker artwork retain their original lettering.
 - **Wordmark embedding and terms:** `artwork/mid90s-minifridge-wordmark.svg` is the vector master; the same paths are inlined in the `#home` button. Revue is rendered from the actual font using HarfBuzz shaping, so the existing CSS-3D peel and click-to-reset animation continues to work. The font binary is not shipped. The supplied source labels Revue **free for personal use**; obtain an appropriate license before public/commercial use. Converting text to SVG does not remove licensing obligations. See `licenses/Revue-Usage-Notes.txt`. Source: [Font.Download](https://font.download/font/revue).
 - **Finish picker:** rounded-square color chips (22 × 22 px) sit inside 32 × 32 px buttons. Zero padding and grid centering make the selected white border exactly concentric on desktop, tablet and mobile. Transparent borders reserve the same space in unselected states; hover does not scale or shift the chip.

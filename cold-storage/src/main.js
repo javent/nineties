@@ -406,7 +406,7 @@ function takeSnapshot() {
     // captured renderer canvas, so only the high-contrast label ink is added.
     ctx.fillStyle = "#17152d";
     ctx.font = `500 ${28 * ratio}px "DM Sans"`;
-    ctx.fillText("Mid90s Minifridge", pad, 60 * ratio);
+    ctx.fillText("1990s XP", pad, 60 * ratio);
     ctx.font = `${11 * ratio}px "DM Sans"`;
     ctx.fillStyle = "#343052";
     ctx.fillText("Your sticker collection", pad, source.height - 38 * ratio);
@@ -421,7 +421,7 @@ function takeSnapshot() {
         toast("Snapshot unavailable. Please try again.");
         return;
       }
-      downloadBlob(blob, "mid90s-minifridge-my-fridge.png");
+      downloadBlob(blob, "1990s-xp-my-fridge.png");
       toast("Snapshot saved.");
     }, "image/png");
   } catch (error) {

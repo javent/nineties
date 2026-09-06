@@ -2,98 +2,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { clamp } from "./utils.js";
 
-function createShaderBackdrop() {
-  const material = new THREE.ShaderMaterial({
-    uniforms: {
-      uTime: { value: 0 },
-      uResolution: { value: new THREE.Vector2(1, 1) },
-    },
-    vertexShader: /* glsl */ `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: /* glsl */ `
-      varying vec2 vUv;
-      uniform float uTime;
-      uniform vec2 uResolution;
-
-      float hash(vec2 p) {
-        p = fract(p * vec2(123.34, 456.21));
-        p += dot(p, p + 45.32);
-        return fract(p.x * p.y);
-      }
-
-      float noise(vec2 p) {
-        vec2 i = floor(p);
-        vec2 f = fract(p);
-        f = f * f * (3.0 - 2.0 * f);
-        return mix(
-          mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-          mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
-          f.y
-        );
-      }
-
-      float fbm(vec2 p) {
-        float value = 0.0;
-        float amplitude = 0.5;
-        for (int i = 0; i < 5; i++) {
-          value += amplitude * noise(p);
-          p = p * 2.03 + vec2(7.1, 2.8);
-          amplitude *= 0.5;
-        }
-        return value;
-      }
-
-      void main() {
-        vec2 p = vUv * 2.0 - 1.0;
-        p.x *= uResolution.x / max(uResolution.y, 1.0);
-        float time = uTime * 0.075;
-        vec2 warp = vec2(
-          sin(p.y * 3.7 + time * 1.4),
-          cos(p.x * 3.2 - time * 1.1)
-        ) * 0.16;
-        vec2 q = p + warp + vec2(time * 0.22, -time * 0.12);
-        float cloud = fbm(q * 0.92 + vec2(1.5, -0.7));
-        float ribbons = 0.5 + 0.5 * sin(
-          q.x * 3.65 + sin(q.y * 4.1 + cloud * 3.0) * 1.9 + time
-        );
-        ribbons = smoothstep(0.2, 0.82, ribbons);
-        float glow = smoothstep(0.72, 0.05, abs(sin(q.x * 1.8 - q.y * 2.1 + cloud * 2.7)));
-
-        vec3 rose = vec3(0.97, 0.63, 0.78);
-        vec3 periwinkle = vec3(0.56, 0.66, 0.98);
-        vec3 aqua = vec3(0.45, 0.94, 0.86);
-        vec3 cream = vec3(1.0, 0.86, 0.76);
-        vec3 lavender = vec3(0.74, 0.52, 0.94);
-        vec3 color = mix(rose, periwinkle, smoothstep(0.12, 0.82, cloud));
-        color = mix(color, aqua, smoothstep(0.45, 0.96, ribbons) * 0.7);
-        color = mix(color, cream, smoothstep(0.34, 0.9, glow) * 0.42);
-        color = mix(color, lavender, smoothstep(0.7, 1.0, cloud) * 0.48);
-
-        float grain = (hash(vUv * uResolution + uTime) - 0.5) * 0.035;
-        float vignette = smoothstep(1.55, 0.22, length(p * vec2(0.52, 0.72)));
-        color = mix(vec3(0.17, 0.11, 0.29), color, 0.72 + vignette * 0.28);
-        color += grain;
-        gl_FragColor = vec4(max(color, 0.0), 1.0);
-      }
-    `,
-    depthTest: false,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-    toneMapped: false,
-  });
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), material);
-  mesh.name = "animated 90s shader backdrop";
-  mesh.position.set(0, 0, -30);
-  mesh.frustumCulled = false;
-  mesh.renderOrder = -100;
-  return mesh;
-}
-
 export function createScene(canvas) {
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -117,7 +25,11 @@ export function createScene(canvas) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x000000);
   scene.fog = null;
-  const backdrop = createShaderBackdrop();
+  // The exterior deliberately clears to exact black. Keep a named scene node so
+  // the portal can share the same visibility contract without adding scenery.
+  const backdrop = new THREE.Object3D();
+  backdrop.name = "minimal black exterior backdrop";
+  backdrop.visible = false;
   scene.add(backdrop);
 
   const camera = new THREE.PerspectiveCamera(34, 1, 0.05, 120);
@@ -182,8 +94,6 @@ export function createScene(canvas) {
     camera.aspect = width / height;
     const canvasRect = canvas.getBoundingClientRect();
     renderer.setSize(width, height, false);
-    backdrop.material.uniforms.uResolution.value.set(width, height);
-
     if (mode === "portal") {
       camera.clearViewOffset();
       camera.fov = width <= 560 ? 44 : 40;
@@ -264,7 +174,6 @@ export function createScene(canvas) {
   resize();
 
   function update(dt) {
-    backdrop.material.uniforms.uTime.value += dt;
     if (resetTween) {
       const alpha = 1 - Math.exp(-dt * (mode === "portal" ? 3.2 : 7));
       camera.position.lerp(resetTween.position, alpha);
@@ -343,8 +252,6 @@ export function createScene(canvas) {
       clearTimeout(endTimer);
       window.removeEventListener("resize", resize);
       controls.dispose();
-      backdrop.geometry.dispose();
-      backdrop.material.dispose();
       renderer.dispose();
     },
   };

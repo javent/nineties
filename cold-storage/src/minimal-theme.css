@@ -570,7 +570,7 @@ dialog::backdrop {
   }
 }
 
-/* A vector rendering of "Mid90s Minifridge" in the requested font, scoped to #home.
+/* The compact "1990s XP" SVG wordmark is scoped to #home.
  * Other text—including dialogs and snapshot labels—stays in DM Sans. */
 #home .brand-wordmark {
   display: block;
