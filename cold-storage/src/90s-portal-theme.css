@@ -1,115 +1,166 @@
-/*
- * Inside-the-fridge field portal plus the minimal black exterior chrome.
- * The final exterior pass below intentionally removes all header/footer fills.
- */
+/* Minimal 1990s XP chrome and the inside-the-fridge field portal. */
 :root {
-  --stage-ink: #17152d;
-  --stage-ink-soft: #343052;
-  --stage-line: rgba(28, 22, 58, 0.28);
-  --stage-panel: rgba(255, 248, 253, 0.76);
-  --stage-accent: #ee3f83;
+  --stage-ink: #fff;
+  --stage-ink-soft: #fff;
+  --stage-line: transparent;
+  --stage-accent: #fff;
   --field-ink: #112449;
   --field-panel: rgba(242, 249, 255, 0.82);
 }
 
 #experience {
-  color: var(--stage-ink);
+  color: #fff;
+  background: #000 !important;
 }
 
-.topbar {
-  border-bottom: 1px solid var(--stage-line);
-  background: rgba(255, 248, 253, 0.18);
-  backdrop-filter: blur(16px) saturate(1.12);
-  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+/* Exterior UI is deliberately only text, icons, and hit areas. */
+.topbar,
+.bottom-bar {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 #home.brand {
-  color: var(--stage-ink);
-  padding: 11px 16px 11px 13px;
-  border: 1px solid rgba(255, 255, 255, 0.48);
-  border-radius: 12px;
-  background: rgba(255, 250, 253, 0.56);
-  box-shadow:
-    0 7px 24px rgba(40, 20, 75, 0.11),
-    inset 0 1px rgba(255, 255, 255, 0.72);
-  text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+  display: flex;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  text-shadow: none;
 }
-#home.brand:hover {
-  color: #3a164d;
-  background: rgba(255, 255, 255, 0.78);
+#home.brand:hover,
+#home.brand:focus-visible {
+  color: #fff !important;
+  background: transparent !important;
 }
 #home .brand-wordmark {
+  display: block;
+  width: 156px;
+  height: auto;
   fill: currentColor;
+  filter: none;
+}
+#home .brand-wordmark text {
+  font-family: "Sticker Heavy", "IBM Plex Mono", sans-serif;
 }
 
+.topbar nav,
 .collection-trigger,
-.story-trigger {
-  color: var(--stage-ink);
-  text-shadow: 0 1px rgba(255, 255, 255, 0.56);
+.story-trigger,
+.finish-picker,
+.bottom-bar,
+.handle-hint {
+  font-family: "IBM Plex Mono", monospace;
 }
-.collection-trigger:hover,
-.story-trigger:hover {
-  color: #4c164f;
+.topbar nav {
+  gap: 24px;
+}
+.collection-trigger,
+.story-trigger,
+.count,
+.finish-caption,
+#finish-name,
+.gesture-guide,
+.gesture-guide b,
+.sound-toggle,
+.gesture-guide .icon,
+.sound-toggle .icon {
+  color: #fff !important;
+  text-shadow: none;
+}
+.collection-trigger,
+.sound-toggle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.collection-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 0;
+}
+.collection-trigger > .icon {
+  display: none;
 }
 .count {
-  color: var(--stage-ink);
-  background: rgba(255, 249, 255, 0.64);
-  border-color: rgba(28, 22, 58, 0.34);
-  font-weight: 600;
+  width: auto;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  border: 0 !important;
+  background: transparent !important;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.count::before {
+  content: "/";
+  padding-right: 7px;
+  color: #fff;
+}
+.story-trigger {
+  width: 28px;
+  height: 28px;
+  border-radius: 0;
+}
+.story-trigger .icon {
+  width: 16px;
+  height: 16px;
 }
 .icon-button:hover {
-  color: var(--stage-ink);
-  background: rgba(255, 255, 255, 0.58);
+  background: transparent !important;
+  color: #fff !important;
 }
 
 .finish-picker {
-  padding: 14px 11px;
-  border: 1px solid rgba(28, 22, 58, 0.24);
-  border-radius: 18px;
-  background: rgba(255, 249, 254, 0.64);
-  box-shadow: 0 8px 24px rgba(38, 17, 67, 0.1);
-  backdrop-filter: blur(14px) saturate(1.1);
-  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 .finish-caption,
 #finish-name {
-  color: var(--stage-ink);
-  text-shadow: 0 1px rgba(255, 255, 255, 0.56);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .swatch.selected {
-  border-color: var(--stage-ink);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.66);
+  border-color: #fff;
+  box-shadow: none;
 }
 .swatch:hover,
 .swatch.selected:hover {
-  border-color: #5a1757;
+  border-color: #fff;
 }
 
-.bottom-bar {
-  border-top: 1px solid var(--stage-line);
-  background: rgba(255, 248, 253, 0.2);
-  backdrop-filter: blur(16px) saturate(1.1);
-  -webkit-backdrop-filter: blur(16px) saturate(1.1);
-}
-.gesture-guide,
-.sound-toggle {
-  color: var(--stage-ink-soft);
-  text-shadow: 0 1px rgba(255, 255, 255, 0.56);
+.gesture-guide {
+  gap: 16px;
+  font-size: 9px;
+  letter-spacing: 0.05em;
 }
 .gesture-guide b {
-  color: var(--stage-ink);
-  font-weight: 700;
+  font-weight: 600;
 }
-.gesture-guide .icon,
-.sound-toggle .icon {
-  color: var(--stage-ink);
+.gesture-guide i,
+.sound-led {
+  background: #fff !important;
 }
-.gesture-guide i {
-  background: var(--stage-accent);
+.sound-toggle {
+  gap: 8px;
+  padding: 9px 0 9px 9px;
 }
 
-/* This hint is deliberately separate from the pointer cursor: it remains
- * discoverable on touch devices where there is no hover state. */
 .handle-hint {
   position: absolute;
   left: 50%;
@@ -118,15 +169,16 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.36);
-  border-radius: 999px;
-  background: rgba(23, 21, 45, 0.9);
-  color: #fff5fc;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  box-shadow: 0 9px 30px rgba(29, 8, 49, 0.25);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 8px #000;
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, 8px);
@@ -139,17 +191,33 @@
 .handle-hint .icon {
   width: 17px;
   height: 17px;
-  color: #ff91c5;
+  color: #fff !important;
 }
 .handle-hint-pulse {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #ff78b7;
-  box-shadow: 0 0 0 4px rgba(255, 120, 183, 0.2), 0 0 15px #ff78b7;
+  background: #fff;
+  box-shadow: 0 0 0 4px #ffffff33, 0 0 15px #fff;
 }
 #world.is-handle-hovering {
   cursor: pointer;
+}
+
+@media (max-width: 800px) {
+  #home .brand-wordmark {
+    width: 107px;
+  }
+}
+@media (max-width: 560px) {
+  #home .brand-wordmark {
+    width: 97px;
+  }
+}
+@media (max-width: 380px) {
+  #home .brand-wordmark {
+    width: 85px;
+  }
 }
 
 /* The field interface is a quiet navy/Windows-blue overlay on top of the bright
@@ -425,257 +493,37 @@ body.portal-active #world:active {
   }
 }
 
-/* Minimal exterior pass: black stage, no glass cards, no opaque chrome. */
-:root {
-  --stage-ink: #f2f2ee;
-  --stage-ink-soft: #aaa9a9;
-  --stage-line: transparent;
-  --stage-panel: transparent;
-  --stage-accent: #f2f2ee;
-}
-
-.topbar {
-  border-bottom: 0;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-#home.brand {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--stage-ink);
-  text-shadow: none;
-}
-#home.brand:hover {
-  color: #fff;
-  background: transparent;
-}
-#home .brand-wordmark {
-  width: 156px;
-  filter: none;
-}
-
-.collection-trigger,
-.story-trigger {
-  color: var(--stage-ink-soft);
-  text-shadow: none;
-}
-.collection-trigger:hover,
-.story-trigger:hover {
-  color: var(--stage-ink);
-}
-.count {
-  width: auto;
-  min-width: 0;
-  height: auto;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #8e8d8f;
-  font-weight: 400;
-}
-.icon-button:hover {
-  color: var(--stage-ink);
-  background: transparent;
-}
-
-.finish-picker {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-.finish-caption,
-#finish-name {
-  color: #8e8d8f;
-  text-shadow: none;
-}
-.swatch.selected {
-  border-color: #f2f2ee;
-  box-shadow: none;
-}
-.swatch:hover,
-.swatch.selected:hover {
-  border-color: #f2f2ee;
-}
-
-.bottom-bar {
-  border-top: 0;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-.gesture-guide,
-.sound-toggle {
-  color: #8e8d8f;
-  text-shadow: none;
-}
-.gesture-guide b {
-  color: #d0cfd0;
-  font-weight: 500;
-}
-.gesture-guide .icon,
-.sound-toggle .icon {
-  color: #b8b7b8;
-}
-.gesture-guide i {
-  background: #69686b;
-}
-
-.handle-hint {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: #f2f2ee;
-  text-shadow: 0 1px 8px #000;
-}
-.handle-hint .icon {
-  color: #f2f2ee;
-}
-
+/* Keep the exterior reset last so portal-responsive rules cannot reintroduce cards. */
 @media (max-width: 800px) {
-  .topbar {
-    background: transparent;
+  .topbar,
+  .bottom-bar {
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
   }
   #home.brand {
-    padding: 0;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  .finish-picker {
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
   }
   #home .brand-wordmark {
     width: 107px;
   }
-  .finish-picker {
-    width: auto;
-    padding: 0;
-  }
 }
-
 @media (max-width: 560px) {
   #home .brand-wordmark {
     width: 97px;
   }
-  .finish-picker {
-    width: auto;
-  }
 }
-
 @media (max-width: 380px) {
   #home .brand-wordmark {
     width: 85px;
   }
-}
-
-/* Readable 1990s terminal chrome: white type, mono labels, zero header/footer fill. */
-.topbar,
-.bottom-bar {
-  background: transparent !important;
-  background-image: none !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-.topbar nav,
-.collection-trigger,
-.story-trigger,
-.finish-picker,
-.bottom-bar,
-.handle-hint {
-  font-family: "IBM Plex Mono", monospace;
-}
-.collection-trigger,
-.story-trigger,
-.count,
-.finish-caption,
-#finish-name,
-.gesture-guide,
-.gesture-guide b,
-.sound-toggle,
-.gesture-guide .icon,
-.sound-toggle .icon {
-  color: #fff !important;
-  text-shadow: none;
-}
-.collection-trigger,
-.sound-toggle {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-}
-.collection-trigger {
-  gap: 8px;
-  padding: 9px 0;
-}
-.collection-trigger > .icon {
-  display: none;
-}
-.count {
-  font-size: 9px;
-  letter-spacing: 0.04em;
-}
-.count::before {
-  content: "/";
-  padding-right: 7px;
-  color: #fff;
-}
-.story-trigger {
-  width: 28px;
-  height: 28px;
-  border-radius: 0;
-}
-.story-trigger .icon {
-  width: 16px;
-  height: 16px;
-}
-.icon-button:hover {
-  background: transparent !important;
-  color: #fff !important;
-}
-.finish-picker {
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-.finish-caption,
-#finish-name {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.swatch.selected {
-  border-color: #fff;
-}
-.gesture-guide {
-  gap: 16px;
-  font-size: 9px;
-  letter-spacing: 0.05em;
-}
-.gesture-guide b {
-  font-weight: 600;
-}
-.gesture-guide i,
-.sound-led {
-  background: #fff !important;
-}
-.sound-toggle {
-  gap: 8px;
-  padding: 9px 0 9px 9px;
-}
-#home .brand-wordmark text {
-  font-family: "Sticker Heavy", "IBM Plex Mono", sans-serif;
-}
-
-:root {
-  --stage-ink: #fff;
-  --stage-ink-soft: #fff;
 }
