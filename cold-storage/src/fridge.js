@@ -33,6 +33,12 @@ export function createFridge(maps) {
     clearcoat: 0.25,
     envMapIntensity: 1.45,
   });
+  // The handle has its own chrome material so it can react to the pointer without
+  // tinting the other hardware. The emissive channel is driven by the interaction
+  // layer below and gives the door a clear, tactile affordance.
+  const handleChrome = chrome.clone();
+  handleChrome.emissive = new THREE.Color("#ff55d9");
+  handleChrome.emissiveIntensity = 0;
   const dullChrome = new THREE.MeshStandardMaterial({
     color: "#969a8c",
     metalness: 0.9,
@@ -48,7 +54,18 @@ export function createFridge(maps) {
     metalness: 0.4,
   });
   const meshes = [];
-  const rounded = (w, h, d, radius, material, x, y, z, segments = 4) => {
+  const rounded = (
+    w,
+    h,
+    d,
+    radius,
+    material,
+    x,
+    y,
+    z,
+    segments = 4,
+    parent = group,
+  ) => {
     const mesh = new THREE.Mesh(
       new RoundedBoxGeometry(w, h, d, segments, radius),
       material,
@@ -56,7 +73,7 @@ export function createFridge(maps) {
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    group.add(mesh);
+    parent.add(mesh);
     return mesh;
   };
   // A deep cabinet, separate rubber gasket and a generously radiused enamel door.
@@ -72,17 +89,54 @@ export function createFridge(maps) {
   rounded(0.1, 0.29, 0.2, 0.045, dullChrome, 1.485, 1.94, 0.99);
   rounded(0.1, 0.29, 0.2, 0.045, dullChrome, 1.485, -1.95, 0.99);
   // Curved chrome handle, with real volume, standoffs and small reflections on its caps.
+  // Keep the complete handle in a named group so raycasting and the open-door
+  // affordance can address it as one physical control.
+  const handleGroup = new THREE.Group();
+  handleGroup.name = "interactive fridge handle";
+  group.add(handleGroup);
+  const handleMeshes = [];
+  const addHandle = (mesh) => {
+    mesh.userData.handle = true;
+    handleMeshes.push(mesh);
+    return mesh;
+  };
   for (const y of [0.17, 1.31]) {
-    rounded(0.19, 0.235, 0.06, 0.029, rubber, -1.065, y, 1.358);
-    rounded(0.175, 0.21, 0.085, 0.038, chrome, -1.065, y, 1.39);
+    addHandle(
+      rounded(
+        0.19,
+        0.235,
+        0.06,
+        0.029,
+        rubber,
+        -1.065,
+        y,
+        1.358,
+        4,
+        handleGroup,
+      ),
+    );
+    addHandle(
+      rounded(
+        0.175,
+        0.21,
+        0.085,
+        0.038,
+        handleChrome,
+        -1.065,
+        y,
+        1.39,
+        4,
+        handleGroup,
+      ),
+    );
     const pin = new THREE.Mesh(
       new THREE.CylinderGeometry(0.052, 0.055, 0.14, 18),
-      chrome,
+      handleChrome,
     );
     pin.rotation.x = Math.PI / 2;
     pin.position.set(-1.065, y, 1.48);
     pin.castShadow = true;
-    group.add(pin);
+    handleGroup.add(addHandle(pin));
   }
   const handleCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(-1.065, 1.34, 1.47),
@@ -94,16 +148,44 @@ export function createFridge(maps) {
   ]);
   const handle = new THREE.Mesh(
     new THREE.TubeGeometry(handleCurve, 48, 0.072, 16, false),
-    chrome,
+    handleChrome,
   );
   handle.castShadow = true;
   handle.receiveShadow = true;
   handle.name = "polished chrome handle";
-  group.add(handle);
+  handleGroup.add(addHandle(handle));
   for (const point of [handleCurve.getPoint(0), handleCurve.getPoint(1)]) {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.071, 16, 12), chrome);
+    const cap = new THREE.Mesh(
+      new THREE.SphereGeometry(0.071, 16, 12),
+      handleChrome,
+    );
     cap.position.copy(point);
-    group.add(cap);
+    handleGroup.add(addHandle(cap));
+  }
+  const handleGlow = new THREE.Mesh(
+    new THREE.TubeGeometry(handleCurve, 48, 0.108, 12, false),
+    new THREE.MeshBasicMaterial({
+      color: "#ff55d9",
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      toneMapped: false,
+    }),
+  );
+  handleGlow.name = "handle hover glow";
+  handleGlow.renderOrder = 4;
+  handleGroup.add(handleGlow);
+  const handleLight = new THREE.PointLight("#ff55d9", 0, 3.4, 2);
+  handleLight.position.set(-1.08, 0.75, 1.63);
+  handleGroup.add(handleLight);
+  let handleHovered = false;
+  function setHandleHovered(value) {
+    handleHovered = !!value;
+    handleChrome.color.set(handleHovered ? "#fff2ff" : "#eeeeeb");
+    handleChrome.emissiveIntensity = handleHovered ? 0.72 : 0;
+    handleGlow.material.opacity = handleHovered ? 0.34 : 0;
+    handleLight.intensity = handleHovered ? 2.5 : 0;
   }
   // The lower toe-kick is not a second door. Narrow ventilation slots + polished trim.
   rounded(2.81, 0.23, 0.085, 0.04, dullChrome, 0, -2.65, 1.003);
@@ -446,6 +528,12 @@ export function createFridge(maps) {
     fitPlacement,
     point,
     setFinish,
+    handleGroup,
+    handleMeshes,
+    setHandleHovered,
+    get handleHovered() {
+      return handleHovered;
+    },
     get finish() {
       return currentFinish;
     },

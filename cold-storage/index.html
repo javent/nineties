@@ -6,10 +6,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#d8c7ed" />
     <meta
       name="description"
-      content="A centered, interactive fridge on a pure black background, with thirty-nine skate-shop sticker graphics. Peel, move, and make it yours."
+      content="A colorful 90s interactive fridge. Explore stickers, wake the glowing handle, and step into a Windows field with a SURGE vending machine."
     />
     <title>Mid90s Minifridge — Interactive fridge</title>
     <link
@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="/src/styles.css" />
     <link rel="stylesheet" href="/src/minimal-theme.css" />
     <link rel="stylesheet" href="/src/drawer.css" />
+    <link rel="stylesheet" href="/src/90s-portal-theme.css" />
   </head>
   <body>
     <svg
@@ -90,6 +91,45 @@
         aria-label="3D fridge. Hold a sticker to peel it, drag it to a new spot and release. Drag empty space to explore. Use the collection for keyboard controls."
         tabindex="0"
       ></canvas>
+
+      <div id="handle-hint" class="handle-hint" aria-hidden="true">
+        <span class="handle-hint-pulse"></span>
+        <span>Open the fridge</span>
+        <svg class="icon"><use href="#i-arrow" /></svg>
+      </div>
+
+      <section
+        id="portal-interface"
+        class="portal-interface"
+        aria-hidden="true"
+        aria-label="Inside the fridge"
+      >
+        <div class="portal-topline">
+          <div class="portal-status">
+            <span class="portal-status-led"></span>
+            <span>cold storage / field connection</span>
+          </div>
+          <button id="portal-exit" class="portal-exit" type="button">
+            <span>Esc</span> Back to fridge
+          </button>
+        </div>
+        <div class="portal-title">
+          <p class="portal-kicker">WINDOWS 95 DESKTOP BACKGROUND // 01</p>
+          <h1>Go touch some grass.</h1>
+          <p>There is a SURGE machine somewhere out there.</p>
+        </div>
+        <div class="portal-target" aria-hidden="true">
+          <span class="portal-target-line"></span>
+          <span class="portal-target-label">SURGE / destination</span>
+        </div>
+        <div class="portal-controls">
+          <span><b>Scroll</b> travel the field</span>
+          <i></i>
+          <span><b>Drag</b> look around</span>
+          <i></i>
+          <span>distance <strong id="portal-distance">12 m</strong></span>
+        </div>
+      </section>
 
       <header class="topbar">
         <button

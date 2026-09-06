@@ -10,6 +10,7 @@ export class Interaction {
     this.pointer = new THREE.Vector2();
     this.active = null;
     this.hovered = null;
+    this.hoveredHandle = false;
     this.selected = null;
     this.demoUntil = 0;
     this.handlers = {
@@ -18,7 +19,10 @@ export class Interaction {
       pointerup: (e) => this.up(e),
       pointercancel: (e) => this.cancel(e),
       pointerleave: () => {
-        if (!this.active) this.setHover(null);
+        if (!this.active) {
+          this.setHandleHovered(false);
+          this.setHover(null);
+        }
       },
       lostpointercapture: (e) => {
         if (this.active?.pointerId === e.pointerId) this.cancel(e);
@@ -54,6 +58,10 @@ export class Interaction {
           (!body || hit.distance <= body.distance + 0.055) &&
           hit.object.userData.sticker.hitIsOpaque(hit.uv),
       );
+  }
+  pickHandle() {
+    if (!this.fridge.handleMeshes?.length) return null;
+    return this.raycaster.intersectObjects(this.fridge.handleMeshes, false)[0] || null;
   }
   get busy() {
     return !!this.active;
@@ -153,6 +161,14 @@ export class Interaction {
     }
     return null;
   }
+  setHandleHovered(value, event) {
+    value = !!value;
+    if (this.hoveredHandle === value) return;
+    this.hoveredHandle = value;
+    this.fridge.setHandleHovered?.(value);
+    this.canvas.classList.toggle("is-handle-hovering", value);
+    this.callbacks.handleHover?.(value, event);
+  }
   setHover(sticker, event) {
     if (this.hovered !== sticker) {
       if (this.hovered) this.hovered.hovered = false;
@@ -192,6 +208,16 @@ export class Interaction {
     }
     this.stopDemo();
     this.setRay(event);
+    const handle = this.pickHandle();
+    if (handle) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      this.setHandleHovered(true, event);
+      this.audio.unlock();
+      this.callbacks.handleClick?.(event, handle.object);
+      return;
+    }
+    this.setHandleHovered(false, event);
     const hit = this.pickSticker();
     if (!hit) {
       this.select(null);
@@ -282,6 +308,12 @@ export class Interaction {
       return;
     }
     this.setRay(event);
+    if (this.pickHandle()) {
+      this.setHover(null, event);
+      this.setHandleHovered(true, event);
+      return;
+    }
+    this.setHandleHovered(false, event);
     this.setHover(this.pickSticker()?.object.userData.sticker || null, event);
   }
   moveActive(event) {
@@ -379,6 +411,7 @@ export class Interaction {
     )
       this.canvas.releasePointerCapture(pointerId);
     this.canvas.classList.remove("is-dragging");
+    this.setHandleHovered(false);
     this.app.renderer.shadowMap.needsUpdate = true;
     this.callbacks.drag?.(false);
   }

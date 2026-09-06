@@ -7,6 +7,7 @@ import { StickerManager } from "./stickers.js";
 import { Interaction } from "./interaction.js";
 import { CollectionDrawer } from "./collection-drawer.js";
 import { BrandPeel } from "./brand-peel.js";
+import { createPortal } from "./portal.js";
 import { CATALOG, CATALOG_VERSION } from "./sticker-art.js";
 import {
   $,
@@ -33,6 +34,7 @@ let progress = 0,
   interaction,
   drawer,
   brandPeel,
+  portal,
   frameId,
   disposed = false,
   renderingPaused = false;
@@ -214,8 +216,47 @@ function openDialog(dialog) {
   dialog.showModal();
 }
 
+function updatePortalInterface(active) {
+  const interfaceElement = $("#portal-interface");
+  if (!interfaceElement) return;
+  interfaceElement.setAttribute("aria-hidden", String(!active));
+  interfaceElement.classList.toggle("visible", active);
+  $("#world").setAttribute(
+    "aria-label",
+    active
+      ? "Inside the fridge: explore a Windows 95 field and travel toward the SURGE vending machine."
+      : "3D fridge. Hold a sticker to peel it, drag it to a new spot and release. Drag empty space to explore. Use the collection for keyboard controls.",
+  );
+}
+function enterPortal() {
+  if (!portal || portal.active) return;
+  drawer?.close();
+  interaction.cancel();
+  interaction.select(null);
+  interaction.setHover(null);
+  interaction.setHandleHovered(false);
+  app.controls.enabled = true;
+  audio.unlock();
+  audio.stick();
+  portal.enter();
+  document.body.classList.add("portal-active");
+  updatePortalInterface(true);
+}
+function exitPortal() {
+  if (!portal?.active) return;
+  audio.unlock();
+  audio.stick();
+  portal.exit();
+  document.body.classList.remove("portal-active");
+  updatePortalInterface(false);
+}
+
 function bindUI() {
   $("#home").onclick = () => {
+    if (portal?.active) {
+      exitPortal();
+      return;
+    }
     drawer.close();
     interaction.cancel();
     interaction.select(null);
@@ -225,6 +266,7 @@ function bindUI() {
     audio.stick();
     app.reset(reducedMotion);
   };
+  $("#portal-exit").onclick = exitPortal;
 
   $$(".swatch").forEach(
     (button) => (button.onclick = () => setFinish(button.dataset.finish, true)),
@@ -360,12 +402,13 @@ function takeSnapshot() {
     ctx.drawImage(source, 0, 0);
     const ratio = source.width / source.clientWidth,
       pad = source.width * 0.06;
-    // Match the viewer exactly: a pure black canvas, no tinted vignette.
-    ctx.fillStyle = "#f0f0f0";
+    // Match the viewer exactly: the animated shader stage is already in the
+    // captured renderer canvas, so only the high-contrast label ink is added.
+    ctx.fillStyle = "#17152d";
     ctx.font = `500 ${28 * ratio}px "DM Sans"`;
     ctx.fillText("Mid90s Minifridge", pad, 60 * ratio);
     ctx.font = `${11 * ratio}px "DM Sans"`;
-    ctx.fillStyle = "#99999e";
+    ctx.fillStyle = "#343052";
     ctx.fillText("Your sticker collection", pad, source.height - 38 * ratio);
     ctx.textAlign = "right";
     ctx.fillText(
@@ -410,13 +453,20 @@ async function init() {
   stickers = new StickerManager(fridge, app.scene);
   await stickers.loadCatalog((fraction) => report(55 + fraction * 22));
   report(77);
+  portal = createPortal(app, fridge, stickers);
+  app.scene.add(portal.group);
   const previous = storedState();
   if (previous && [1, 2, 3].includes(previous.version)) {
     await stickers.restore(previous.stickers);
     setFinish(previous.finish || "cream");
     audio.enabled = previous.sound !== false;
   }
-  interaction = new Interaction(app, fridge, stickers, audio);
+  interaction = new Interaction(app, fridge, stickers, audio, {
+    handleClick: () => enterPortal(),
+    handleHover: (active) => {
+      $("#handle-hint")?.classList.toggle("visible", active);
+    },
+  });
   drawer = new CollectionDrawer($("#collection-dialog"), interaction, {
     reducedMotion,
   });
@@ -458,8 +508,9 @@ async function init() {
     previousTime = now;
     if (document.hidden || renderingPaused) return;
     interaction.update();
+    portal?.update(dt);
     app.update(dt);
-    if (stickers.update(dt, reducedMotion))
+    if (!portal?.active && stickers.update(dt, reducedMotion))
       app.renderer.shadowMap.needsUpdate = true;
     app.renderer.render(app.scene, app.camera);
   }
@@ -475,6 +526,13 @@ async function init() {
       saveSoon.flush();
     }
   });
+  const portalKeyHandler = (event) => {
+    if (event.key === "Escape" && portal?.active) {
+      event.preventDefault();
+      exitPortal();
+    }
+  };
+  window.addEventListener("keydown", portalKeyHandler);
   window.addEventListener("pagehide", (event) => {
     saveSoon.flush();
     if (!event.persisted) dispose();
@@ -487,6 +545,9 @@ async function init() {
     interaction,
     collection: drawer,
     brandPeel,
+    portal,
+    enterPortal,
+    exitPortal,
     takeSnapshot,
     reset: () => stickers.reset(),
     save,
@@ -505,6 +566,7 @@ function dispose() {
   brandPeel?.dispose();
   interaction?.dispose();
   stickers?.dispose();
+  portal?.dispose();
   lighting?.dispose();
   audio.dispose();
   const geometries = new Set(),

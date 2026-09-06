@@ -2,7 +2,7 @@
 
 ### A minimal, centered sticker playground.
 
-An interactive Three.js refrigerator and thirty-nine reference-led skate and band stickers on a **pure black background**. The fridge, chrome handle, printed paper and silver adhesive backs remain real-time 3D. The interface uses clean DM Sans typography and neutral controls, with a wood-lined collection drawer and the requested Revue font reserved for the top-left wordmark; there is no room scenery, floor plane, fog, film grain, distressed lettering, or introductory hero copy.
+An interactive Three.js refrigerator and thirty-nine reference-led skate and band stickers on an animated pastel 90s shader stage. Hover the chrome handle to wake its neon glow, then click it to open a Windows 95 field with a modeled SURGE vending machine waiting in the distance. The fridge, hardware, printed paper, field, and vending machine remain real-time 3D. The interface uses high-contrast DM Sans typography and a wood-lined collection drawer, with the requested Revue font reserved for the top-left wordmark.
 
 ## Run it
 
@@ -37,7 +37,9 @@ The dependency is pinned to **Three.js 0.185.1**. The complete source uses ES mo
 | Zoom               | Scroll or use the + / − keyboard keys                                | Pinch                                             |
 | Place from drawer  | Drag onto enamel, or click to pick then click the fridge             | Hold and drag, or tap to pick then tap the fridge |
 | Keyboard placement | Focus a drawer card and press Enter; use arrows / brackets to adjust | Keyboard if connected                             |
-| Reset camera       | Click the top-left wordmark                                          | Tap the top-left wordmark                         |
+| Open the fridge     | Hover, then click the chrome handle                                 | Tap the handle                                    |
+| Travel the field   | Scroll to approach; drag to look around                             | Drag / pinch                                      |
+| Reset camera       | Click the top-left wordmark; Esc exits the field                     | Tap the top-left wordmark                         |
 | Move selected      | Arrow keys                                                           | Keyboard if connected                             |
 | Rotate selected    | `[` / `]`                                                            | Keyboard if connected                             |
 | Fine adjustment    | Hold Shift with arrow / bracket keys                                 | —                                                 |
@@ -48,7 +50,8 @@ Additional controls: three enamel finishes (Buttermilk, Sea glass, and Hunter gr
 
 | File                                     | Responsibility                                                                                  |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `src/scene.js`                           | Renderer, camera, centered responsive framing, damped OrbitControls, pure black scene           |
+| `src/scene.js`                           | Renderer, animated pastel shader backdrop, camera, and damped OrbitControls                    |
+| `src/portal.js`                          | Windows 95 field, 3D SURGE vending machine, field navigation, and portal state                 |
 | `src/lighting.js`                        | Warm key, fill/rim lights, real HDRI + procedural fallback                                      |
 | `src/textures.js`                        | Downloaded PBR maps, procedural micrograin/scuffs/fingerprint roughness                         |
 | `src/fridge.js`                          | Rounded cabinet and single door, gasket, chrome hardware, condenser, placement surfaces         |
@@ -63,6 +66,7 @@ Additional controls: three enamel finishes (Buttermilk, Sea glass, and Hunter gr
 | `src/utils.js`                           | Deterministic noise, asset helpers, local Web Audio effects                                     |
 | `src/styles.css`                         | Responsive interface, embedded-compatible local fonts and reduced-motion support                |
 | `src/minimal-theme.css`                  | Unified DM Sans UI, neutral palette, clean labels and restrained controls                       |
+| `src/90s-portal-theme.css`               | High-contrast pastel-stage and Windows-field portal chrome                                      |
 | `artwork/mid90s-minifridge-wordmark.svg` | Outlined Revue wordmark; no font binary or runtime font download                                |
 | `tools/make-wordmark.py`                 | Regenerates the SVG and inline header from a separately obtained font file                      |
 | `tools/standalone.mjs`                   | Offline single-file packaging                                                                   |
@@ -112,7 +116,7 @@ For Buttermilk and Sea glass, `fridge.js` uses metalness `0.67`, clearcoat `0.48
 
 ### 2. HDRI
 
-Bundled: [Poly Haven — Studio Small 09](https://polyhaven.com/a/studio_small_09), **1K HDR**, by Sergej Majboroda, CC0. It is prefiltered with PMREM for chrome, enamel, and adhesive reflections. The HDRI affects reflections only; the visible background remains pure black.
+Bundled: [Poly Haven — Studio Small 09](https://polyhaven.com/a/studio_small_09), **1K HDR**, by Sergej Majboroda, CC0. It is prefiltered with PMREM for chrome, enamel, and adhesive reflections. The HDRI affects reflections only; the visible exterior is the animated shader backdrop and the interior uses the field portal.
 
 To change the room, choose a garage, workshop, kitchen, or soft studio environment from [Poly Haven HDRIs](https://polyhaven.com/hdris), add its `.hdr` to `public/assets`, and change the `asset(...)` filename in `lighting.js`. A 1K–2K HDR is a good web compromise. A procedural `RoomEnvironment` remains available if the HDR cannot load.
 
@@ -209,6 +213,12 @@ The existing 24 stickers keep their placements. The new band graphics start **in
 - **Already placed:** dragging its card moves the existing sticker—it does not create a duplicate. Placed stickers have a small checkmark in the drawer.
 - **Invalid drop / cancellation:** an unplaced sticker returns to the drawer; an already-placed sticker returns to its prior position. No informational toast is shown.
 
+### Shader stage, handle affordance, and field portal
+
+The fridge now sits in a procedural pastel shader stage inspired by the supplied abstract 90s reference. The stage uses animated warped color ribbons, soft grain, and a dark plum edge falloff, while the header, wordmark, finish picker, icons, and footer use ink-dark glass treatments for reliable contrast.
+
+The chrome handle is a first-class raycast target. Hovering changes its chrome color, adds emissive magenta light, enables a larger additive glow tube, and reveals an “Open the fridge” hint. Clicking swaps to a second Three.js mode: the supplied field image becomes the Windows desktop-style horizon, a green 3D SURGE machine is assembled from rounded cabinet parts, textured graphics, payment hardware, an extruded can, a turquoise pallet, and the supplied vending-machine photo as a small side decal. The portal has relaxed orbit bounds, scroll dolly navigation, a distance readout, and Esc / Back to fridge controls.
+
 ### Quieter scene and revised badge
 
 The floating sticker-name/drag/selection overlays and finish-change toasts are removed. Error messages are retained where needed; unavailable storage is reported in the drawer's save note instead of a color-change toast. There is no reset/zoom/snapshot toolbar. Scroll/pinch and the + / − keys still zoom, and clicking the top-left wordmark resets the view without changing the sticker arrangement.
@@ -225,13 +235,13 @@ Saved format version 3 adds the `placed` Boolean. Older stored stickers without 
 
 ## Minimal art direction
 
-- **Background:** the renderer clears to exact `#000000`. There is no visible room, floor, horizon, fog, vignette or film-grain overlay. Snapshot export also preserves the black background without a tinted overlay.
+- **Background:** the fridge uses a custom animated GLSL pastel shader backdrop. The inside state uses the supplied `field.jpg` horizon and a navigable field plane; the portal's bright wallpaper and UI panels are kept readable with navy ink and translucent light glass.
 - **Typography:** interface labels, menus, dialogs and export labels use **DM Sans**. Only the top-left `Mid90s Minifridge` wordmark uses the requested **Revue Regular**, from the user-specified Font.Download page, rendered as a responsive inline SVG using the actual font outlines and HarfBuzz shaping. No global font-family change is made. The vintage appliance badge and sticker artwork retain their original lettering.
 - **Wordmark embedding and terms:** `artwork/mid90s-minifridge-wordmark.svg` is the vector master; the same paths are inlined in the `#home` button. Revue is rendered from the actual font using HarfBuzz shaping, so the existing CSS-3D peel and click-to-reset animation continues to work. The font binary is not shipped. The supplied source labels Revue **free for personal use**; obtain an appropriate license before public/commercial use. Converting text to SVG does not remove licensing obligations. See `licenses/Revue-Usage-Notes.txt`. Source: [Font.Download](https://font.download/font/revue).
 - **Finish picker:** rounded-square color chips (22 × 22 px) sit inside 32 × 32 px buttons. Zero padding and grid centering make the selected white border exactly concentric on desktop, tablet and mobile. Transparent borders reserve the same space in unselected states; hover does not scale or shift the chip.
 - **Controls:** neutral black/gray stage controls and centered square finish swatches; the collection panel uses wood and muted brass tones. No floating sticker tooltips or normal finish-change toasts. The header is the reset control; the old view toolbar is absent.
 - **Lighting:** soft, near-neutral studio key/fill/rim lighting keeps the enamel and chrome readable on black. The HDRI is used only for reflections; it is not displayed as scenery. Metallic adhesive backs and sticker contact shadows remain intact.
-- **Editing:** the visual treatment is isolated in `src/minimal-theme.css`. The standalone packager embeds it together with `src/styles.css`, `src/drawer.css`, the wood image, and local font files. Scene/background and camera framing are in `src/scene.js`.
+- **Editing:** the original viewer treatment remains in `src/minimal-theme.css`; stage and portal chrome live in `src/90s-portal-theme.css`. The standalone packager embeds both together with `src/styles.css`, `src/drawer.css`, the reference images, wood image, and local font files. Scene/background and camera framing are in `src/scene.js`.
 - **Continuity:** the fridge remains centered across viewport sizes. Existing sticker IDs, layouts, uploads, finishes and sound preferences are retained; the revised drawer-placement controls are documented above.
 
 To regenerate the outlined wordmark after obtaining the font and appropriate permission:
@@ -252,7 +262,7 @@ The generator updates both the SVG master and the inline header. It does not cop
 - No heavy bloom, physics engine, remote API, or postprocessing chain. Specular sheen comes from the PBR/HDRI setup.
 - Removed custom stickers dispose their geometries, materials, and textures. Page teardown also releases scene resources.
 - Reduced-motion preferences simplify the curl response. Keyboard selection is available in the collection. Touch gestures use pointer capture and `touch-action: none`.
-- No ground plane is rendered. Alpha-shaped contact shadows remain on the fridge underneath the stickers; the refrigerator and hardware still receive real light and cast shadows on one another.
+- No ground plane is rendered in the exterior fridge view. The field portal intentionally adds a large grass plane so scroll navigation has a horizon and a place for the SURGE machine's shadow; alpha-shaped contact shadows remain on the fridge underneath stickers.
 - Default desktop inspection for this edition: 117 main-pass draw calls and approximately 129,154 main-pass triangles. These are scene-complexity observations, not a measured hardware frame rate.
 
 ## Checks

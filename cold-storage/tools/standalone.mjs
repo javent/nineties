@@ -26,7 +26,9 @@ let css =
   "\n" +
   (await fs.readFile(path.join(root, "src/minimal-theme.css"), "utf8")) +
   "\n" +
-  (await fs.readFile(path.join(root, "src/drawer.css"), "utf8"));
+  (await fs.readFile(path.join(root, "src/drawer.css"), "utf8")) +
+  "\n" +
+  (await fs.readFile(path.join(root, "src/90s-portal-theme.css"), "utf8"));
 css = css.replace(
   /url\((["']?)\/assets\/([^)'"\s]+)\1\)/g,
   (_, quote, name) => {
@@ -62,9 +64,16 @@ html = html.replace(
   "",
 );
 html = html.replace(
+  /<link\s+rel="stylesheet"\s+href="\/src\/90s-portal-theme\.css"\s*\/?>/,
+  "",
+);
+html = html.replace(
   /<link\s+rel="stylesheet"\s+href="\/src\/styles\.css"\s*\/?>/,
   () => `<style>${css}</style>`,
 );
+// Removing the modular stylesheet tags leaves indented blank lines in the
+// source template; normalize them so the generated downloads stay diff-clean.
+html = html.replace(/^[ \t]+$/gm, "");
 html = html.replace(
   /<script\b[^>]*src=["']\/src\/main\.js["'][^>]*><\/script>/,
   () =>
@@ -78,7 +87,8 @@ if (
   html.includes('src="/src/main.js"') ||
   html.includes('href="/src/styles.css"') ||
   html.includes('href="/src/minimal-theme.css"') ||
-  html.includes('href="/src/drawer.css"')
+  html.includes('href="/src/drawer.css"') ||
+  html.includes('href="/src/90s-portal-theme.css"')
 )
   throw new Error("Entry point was not inlined.");
 const licenseSections = [];
