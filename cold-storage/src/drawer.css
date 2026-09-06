@@ -1,0 +1,371 @@
+/* The collection is a walnut-lined drawer; the main canvas stays pure black. */
+#collection-dialog {
+  --drawer-wood: url("/assets/drawer-wood.jpg");
+  z-index: 30;
+  width: 458px;
+  padding: 22px 24px 30px;
+  color: #f0e5ce;
+  border: 0;
+  border-left: 12px solid #513620;
+  border-right: 8px solid #3f291a;
+  background-color: #543b29;
+  background-image:
+    linear-gradient(
+      90deg,
+      #1b0e0845,
+      transparent 13%,
+      transparent 88%,
+      #160a0750
+    ),
+    var(--drawer-wood);
+  background-size:
+    100% 100%,
+    520px 520px;
+  box-shadow:
+    inset 9px 0 18px #160a0870,
+    inset -5px 0 13px #10070470,
+    -22px 0 55px #0009;
+  scrollbar-width: thin;
+  scrollbar-color: #a88c62 #332215;
+  scroll-behavior: auto;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+#collection-dialog::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background:
+    linear-gradient(#c1a17765, #4a2d1b55),
+    var(--drawer-wood) center/500px;
+  box-shadow:
+    0 4px 8px #170a0760,
+    inset 0 1px #d2ba884d;
+}
+#collection-dialog.is-opening {
+  animation: drawer-in 0.24s cubic-bezier(0.16, 0.7, 0.2, 1) both;
+}
+#collection-dialog.is-closing {
+  display: block;
+  pointer-events: none;
+  animation: drawer-out 0.19s ease-in both;
+}
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes drawer-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(103%);
+  }
+}
+.drawer-pull {
+  height: 23px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.drawer-pull span {
+  width: 80px;
+  height: 9px;
+  border-radius: 5px;
+  background: linear-gradient(#cab58b, #786444 45%, #3c3020 55%, #a08a60);
+  border: 1px solid #d0bb8861;
+  box-shadow:
+    0 5px 6px #12080590,
+    0 -1px 0 #e1d3aa45;
+  position: relative;
+}
+.drawer-pull span::before,
+.drawer-pull span::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  width: 11px;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #645233, #bca57a, #6e5a3d);
+  box-shadow: 0 3px 3px #16090860;
+}
+.drawer-pull span::before {
+  left: -5px;
+}
+.drawer-pull span::after {
+  right: -5px;
+}
+#collection-dialog .drawer-header {
+  margin-bottom: 11px;
+}
+#collection-dialog h2 {
+  color: #f3e6c9;
+  font-size: 27px;
+  letter-spacing: -0.65px;
+  text-shadow: 0 1px 2px #180d0c7a;
+}
+#collection-dialog .icon-button {
+  color: #d9c7a5;
+}
+#collection-dialog .icon-button:hover {
+  color: #fff4df;
+  background: #edcf8620;
+}
+#collection-dialog .drawer-description {
+  font-size: 12px;
+  line-height: 1.65;
+  color: #d2bfa1;
+}
+#collection-dialog .collection-filters {
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 19px 0 18px;
+  margin-bottom: 15px;
+  border-color: #d8b58436;
+}
+#collection-dialog .collection-filters button {
+  background: #21130d35;
+  border-color: #cfa56d42;
+  color: #e1ccaa;
+  font-size: 11px;
+  padding: 8px 10px;
+}
+#collection-dialog .collection-filters button.active {
+  color: #372517;
+  background: #dfd0ad;
+  border-color: #e4d2ae;
+  box-shadow: 0 2px 5px #140a0852;
+}
+#collection-dialog .collection-filters span {
+  font-size: 9px;
+}
+#sticker-grid {
+  position: relative;
+  gap: 15px 17px;
+  padding: 14px 10px 8px;
+  background-image: linear-gradient(#160d094a, #12090440), var(--drawer-wood);
+  background-size:
+    auto,
+    440px 440px;
+  border: 1px solid #28160e;
+  border-top: 4px solid #47301e;
+  box-shadow:
+    inset 6px 7px 17px #1109046e,
+    inset -4px -4px 11px #160b064d,
+    0 1px 0 #c59e6a4d;
+  border-radius: 3px;
+}
+#sticker-grid::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 3px);
+  width: 6px;
+  background:
+    linear-gradient(90deg, #2b190e, #a27a4966, #3d2615),
+    var(--drawer-wood) center/500px;
+  box-shadow:
+    3px 0 5px #190c0755,
+    -1px 0 #d1ab7340;
+  pointer-events: none;
+}
+#collection-dialog .sticker-card {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  padding: 0 0 11px;
+  gap: 7px;
+  border-radius: 0;
+  border-bottom: 3px solid #624429;
+  box-shadow:
+    0 1px 0 #d1aa6e36,
+    0 5px 7px -5px #150805c9;
+}
+#collection-dialog .sticker-card.is-held {
+  cursor: grabbing;
+}
+#collection-dialog .sticker-preview {
+  height: 135px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  transform: none;
+}
+#collection-dialog .sticker-preview img {
+  width: 86%;
+  height: 82%;
+  pointer-events: none;
+  filter: drop-shadow(1px 4px 2px #160b069e);
+  transform: rotate(-3deg);
+  transition:
+    transform 0.18s,
+    filter 0.18s,
+    opacity 0.18s;
+}
+#collection-dialog .sticker-card:nth-child(3n) .sticker-preview img {
+  transform: rotate(4deg);
+}
+#collection-dialog .sticker-card:hover .sticker-preview img,
+#collection-dialog .sticker-card.is-held .sticker-preview img {
+  transform: translateY(-3px) rotate(-1deg);
+  filter: drop-shadow(2px 8px 4px #1509028f);
+}
+#collection-dialog .sticker-card.is-on-fridge .sticker-preview img {
+  opacity: 0.8;
+}
+#collection-dialog .sticker-card.is-on-fridge:hover .sticker-preview img {
+  opacity: 1;
+}
+#collection-dialog .sticker-preview::after {
+  content: "";
+}
+#collection-dialog .sticker-card.is-on-fridge .sticker-preview::after {
+  content: "✓";
+  right: 3px;
+  bottom: 0;
+  color: #d2bc8a;
+  font-size: 13px;
+}
+#collection-dialog .sticker-number {
+  color: #c2a479;
+  font-size: 8px;
+  left: 3px;
+  top: 0;
+}
+#collection-dialog .sticker-card-label {
+  color: #ead9b7;
+  font-size: 11px;
+  line-height: 1.45;
+  gap: 5px;
+}
+#collection-dialog .sticker-card-label small {
+  color: #bfa680;
+  font-size: 8px;
+}
+#collection-dialog .sticker-card:focus-visible {
+  outline: 1px solid #ead7a8;
+  outline-offset: 4px;
+}
+#collection-dialog .drawer-footer {
+  border-top: 1px solid #dfb88536;
+  margin-top: 23px;
+  padding-top: 20px;
+  gap: 17px 10px;
+}
+#collection-dialog .upload-button {
+  background: #25170f47;
+  border-color: #ccac7970;
+  color: #efdcbb;
+  font-size: 11px;
+}
+#collection-dialog .upload-button:hover {
+  background: #35211575;
+  border-color: #e4bf85;
+}
+#collection-dialog .upload-button small {
+  color: #bca57f;
+  font-size: 7px;
+}
+#collection-dialog .reset-stickers {
+  color: #d6bf98;
+}
+#collection-dialog .auto-save-note {
+  color: #bba27a;
+  font-size: 9px;
+}
+/* Raised middle creases and edge curl. All paper pieces share the Revue outline. */
+#home.brand {
+  position: relative;
+  perspective: 650px;
+  transform-style: preserve-3d;
+  transform: none;
+}
+/* Transparent hit padding contains the lifted middle folds without moving layout. */
+#home.brand::before {
+  content: "";
+  position: absolute;
+  inset: -12px -5px;
+}
+#home .brand-template {
+  opacity: 0;
+}
+.brand-peel-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  transform-origin: center bottom;
+}
+.brand-slice {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+}
+.brand-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.brand-face svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.brand-back {
+  transform: rotateY(180deg);
+}
+@media (max-width: 560px) {
+  #collection-dialog {
+    width: 100%;
+    padding: 21px 17px 26px;
+    border-left-width: 8px;
+    border-right-width: 7px;
+  }
+  #collection-dialog h2 {
+    font-size: 25px;
+  }
+  #collection-dialog .drawer-description {
+    font-size: 12px;
+  }
+  #sticker-grid {
+    padding: 13px 9px 6px;
+    gap: 14px 16px;
+  }
+  #collection-dialog .sticker-preview {
+    height: 130px;
+  }
+  #collection-dialog .sticker-card-label {
+    font-size: 10px;
+  }
+  #collection-dialog .sticker-card-label small {
+    font-size: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #collection-dialog.is-opening,
+  #collection-dialog.is-closing {
+    animation: none;
+  }
+  #collection-dialog .sticker-preview img {
+    transition: none;
+  }
+}

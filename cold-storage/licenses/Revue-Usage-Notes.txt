@@ -1,0 +1,19 @@
+REVUE — HEADER WORDMARK
+
+Typeface: Revue Regular (internal family name: Revue).
+User-specified source: https://font.download/font/revue
+Download: https://font.download/dl/font/revue.zip
+File in the supplied archive: reve.ttf
+
+The source listing labels this font "Free for personal use". The archive contains
+the font file but no detailed license document; the font name tables do not provide
+a license URL or designer attribution. Do not treat the listing as a commercial
+webfont or brand license. Obtain appropriate permission from the rights holder
+before public/commercial use.
+
+This project contains only an SVG rendering of "Mid90s Minifridge" created using
+Revue's actual glyph outlines and HarfBuzz shaping. It does not redistribute the
+TTF/WOFF font binary. Outlining does not waive licensing requirements.
+
+Revue is used only in the top-left wordmark. The rest of the interface continues
+to use DM Sans; the header's peel/press-down/reset interactions are unchanged.

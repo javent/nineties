@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="A centered, interactive fridge on a pure black background, with thirty-nine skate-shop sticker graphics. Peel, move, and make it yours."
+    />
+    <title>Mid90s Minifridge — Interactive fridge</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%2320241e'/%3E%3Cpath d='M15 9h18a4 4 0 0 1 4 4v23a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3V13a4 4 0 0 1 4-4Z' fill='%23e7e5d3'/%3E%3Cpath d='M16 19v8' stroke='%2320241e' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='28' cy='26' r='6' fill='%23df7952'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <link rel="stylesheet" href="/src/minimal-theme.css" />
+    <link rel="stylesheet" href="/src/drawer.css" />
+  </head>
+  <body>
+    <svg
+      class="icon-definitions"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <defs>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M4 12h15M13 5l7 7-7 7" />
+        </symbol>
+        <symbol id="i-close" viewBox="0 0 24 24">
+          <path d="m6 6 12 12M18 6 6 18" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24">
+          <path d="M5 12h14M12 5v14" />
+        </symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" /></symbol>
+        <symbol id="i-reset" viewBox="0 0 24 24">
+          <path d="M4 10a8 8 0 1 1 .9 7M4 4v6h6" />
+        </symbol>
+        <symbol id="i-frame" viewBox="0 0 24 24">
+          <path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4M9 9h6v6H9z" />
+        </symbol>
+        <symbol id="i-camera" viewBox="0 0 24 24">
+          <path d="M8 6 9.5 4h5L16 6h4v14H4V6Z" />
+          <circle cx="12" cy="12.5" r="3.5" />
+        </symbol>
+        <symbol id="i-peel" viewBox="0 0 24 24">
+          <path
+            d="M20 12V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h7l8-8ZM12 20v-6a2 2 0 0 1 2-2h6"
+          />
+        </symbol>
+        <symbol id="i-move" viewBox="0 0 24 24">
+          <path
+            d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3"
+          />
+        </symbol>
+        <symbol id="i-volume" viewBox="0 0 24 24">
+          <path
+            d="m11 4-6 5H2v6h3l6 5V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"
+          />
+        </symbol>
+        <symbol id="i-muted" viewBox="0 0 24 24">
+          <path d="m11 4-6 5H2v6h3l6 5V4Zm5 5 6 6m0-6-6 6" />
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 11v6M12 7v.5" />
+        </symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <path d="M14 14h7v4l-3 3h-4Z" />
+        </symbol>
+        <symbol id="i-upload" viewBox="0 0 24 24">
+          <path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L19 6" />
+        </symbol>
+      </defs>
+    </svg>
+
+    <main id="experience" aria-label="Interactive vintage refrigerator">
+      <canvas
+        id="world"
+        aria-label="3D fridge. Hold a sticker to peel it, drag it to a new spot and release. Drag empty space to explore. Use the collection for keyboard controls."
+        tabindex="0"
+      ></canvas>
+
+      <header class="topbar">
+        <button
+          class="brand"
+          id="home"
+          aria-label="Mid90s Minifridge — reset view"
+        >
+          <svg
+            class="brand-wordmark"
+            data-typeface="Revue"
+            aria-hidden="true"
+            focusable="false"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 9007 1071"
+            fill="currentColor"
+          >
+            <title>Mid90s Minifridge</title>
+            <desc>
+              Wordmark rendered from Revue Regular using the user-specified
+              Font.Download source. This is an outlined image, not a bundled
+              font. See the font usage notes before public or commercial use.
+            </desc>
+            <g transform="translate(-59 846) scale(1 -1)">
+              <path
+                d="M829 817V0H615V494H613L448 274L287 494H285V0H71V817H274L448 577L626 817H829ZM1146 604V0H954V604H1146ZM1146 817V654H954V817H1146ZM1578 817H1770V0H1571Q1427 0 1323.5 110.0Q1220 220 1220 371Q1220 460 1273.0 531.5Q1326 603 1471 603L1578 604V817ZM1578 441H1510Q1502 440 1491.5 439.5Q1481 439 1471 437Q1450 432 1433.0 415.0Q1416 398 1416 357Q1416 355 1416.0 352.5Q1416 350 1416 347Q1419 282 1461.5 226.5Q1504 171 1572 162L1578 163V441ZM1970 0 1920 184Q1939 184 1959.5 186.0Q1980 188 2000 191Q2045 197 2088.0 213.0Q2131 229 2163 264Q2003 290 1917.0 372.0Q1831 454 1831 578Q1831 591 1832.5 605.0Q1834 619 1837 633Q1852 708 1919.5 771.0Q1987 834 2135 834Q2314 834 2389.0 749.0Q2464 664 2464 518Q2464 498 2462.5 477.5Q2461 457 2458 436Q2435 271 2319.5 134.5Q2204 -2 1999 -1Q1992 -1 1985.0 -1.0Q1978 -1 1970 0ZM2236 442Q2240 454 2242.5 467.0Q2245 480 2247 494Q2248 503 2248.5 511.5Q2249 520 2249 529Q2249 578 2222.0 609.5Q2195 641 2143 641Q2106 641 2080.0 622.0Q2054 603 2054 565Q2054 520 2090.0 494.0Q2126 468 2170 455Q2187 450 2204.0 446.5Q2221 443 2236 441ZM2870 -18Q2733 -18 2650.5 90.0Q2568 198 2535 327Q2523 374 2517.0 420.0Q2511 466 2511 507Q2511 512 2511.0 516.5Q2511 521 2511 526Q2515 642 2582.5 738.0Q2650 834 2870 834Q3090 834 3157.5 738.0Q3225 642 3229 526Q3229 521 3229.0 516.5Q3229 512 3229 507Q3229 466 3223.0 420.0Q3217 374 3205 327Q3172 198 3089.5 90.0Q3007 -18 2870 -18ZM2870 184Q2913 183 2943.5 240.0Q2974 297 2990 366Q2998 400 3002.0 432.5Q3006 465 3006 491Q3006 563 2975.5 603.0Q2945 643 2870 643Q2795 643 2764.5 603.0Q2734 563 2734 491Q2734 465 2738.0 432.5Q2742 400 2750 366Q2766 297 2796.5 240.0Q2827 183 2870 183ZM3607 604 3655 446H3569Q3538 445 3526.0 440.5Q3514 436 3514 422Q3514 416 3517.0 410.5Q3520 405 3524 400Q3526 397 3527.5 395.5Q3529 394 3530 392L3615 286Q3639 255 3656.0 221.0Q3673 187 3673 147Q3673 89 3632.5 44.5Q3592 0 3522 0H3327L3279 163H3385Q3388 162 3392.0 161.5Q3396 161 3400 161Q3404 161 3408.0 160.5Q3412 160 3416 160Q3417 160 3418.5 160.0Q3420 160 3421 160Q3433 160 3442.0 163.0Q3451 166 3451 176Q3451 180 3449.0 185.0Q3447 190 3445 195Q3443 198 3440.5 201.5Q3438 205 3436 208Q3432 212 3429.0 216.0Q3426 220 3424 223L3343 329Q3319 359 3301.5 391.5Q3284 424 3284 464Q3284 475 3287.5 491.0Q3291 507 3300 524Q3315 554 3349.5 578.5Q3384 603 3446 603L3607 604ZM4879 817V0H4665V494H4663L4498 274L4337 494H4335V0H4121V817H4324L4498 577L4676 817H4879ZM5196 604V0H5004V604H5196ZM5196 817V654H5004V817H5196ZM5303 604H5601Q5724 603 5770.5 547.0Q5817 491 5817 371V0H5625V344Q5625 344 5625.0 344.5Q5625 345 5625 346Q5623 403 5612.0 421.0Q5601 439 5541 440L5495 441V0H5303V604ZM6116 604V0H5924V604H6116ZM6116 817V654H5924V817H6116ZM6237 446H6195V604H6237Q6236 611 6236.0 619.5Q6236 628 6236 636Q6236 717 6277.5 766.5Q6319 816 6422 816L6524 817L6572 654H6501Q6498 653 6495.0 653.0Q6492 653 6489 653Q6463 654 6445.5 648.5Q6428 643 6429 611Q6429 610 6429.0 607.5Q6429 605 6429 603L6542 604V446H6429V0H6237V446ZM6608 604H6792V569Q6821 595 6854.0 605.5Q6887 616 6926 617V445Q6888 443 6854.0 428.5Q6820 414 6800 379V0H6608V604ZM7196 604V0H7004V604H7196ZM7196 817V654H7004V817H7196ZM7628 817H7820V0H7621Q7477 0 7373.5 110.0Q7270 220 7270 371Q7270 460 7323.0 531.5Q7376 603 7521 603L7628 604V817ZM7628 441H7560Q7552 440 7541.5 439.5Q7531 439 7521 437Q7500 432 7483.0 415.0Q7466 398 7466 357Q7466 355 7466.0 352.5Q7466 350 7466 347Q7469 282 7511.5 226.5Q7554 171 7622 162L7628 163V441ZM8434 604V5Q8434 -120 8385.0 -166.5Q8336 -213 8202 -213H7989L7940 -50H8156Q8159 -50 8163.0 -50.0Q8167 -50 8170 -51Q8174 -51 8178.0 -51.0Q8182 -51 8186 -51Q8207 -51 8224.5 -42.5Q8242 -34 8242 0Q8097 0 7993.5 110.0Q7890 220 7890 371Q7890 460 7943.0 531.5Q7996 603 8141 603L8434 604ZM8242 441H8180Q8172 440 8161.5 439.5Q8151 439 8141 437Q8120 432 8103.0 415.0Q8086 398 8086 357Q8086 355 8086.0 352.5Q8086 350 8086 347Q8089 282 8131.5 226.5Q8174 171 8242 162V441ZM9025 163 8977 0H8861Q8717 0 8613.5 110.0Q8510 220 8510 371Q8512 499 8575.5 559.0Q8639 619 8787 617L8827 618Q8926 617 8973.5 590.0Q9021 563 9038 531Q9050 507 9052.0 486.0Q9054 465 9054 454Q9054 453 9054.0 452.0Q9054 451 9054 450Q9054 357 8993.0 293.5Q8932 230 8858 186Q8852 183 8846.5 179.5Q8841 176 8835 173Q8873 165 8899.0 163.5Q8925 162 8949 162L9025 163ZM8858 424Q8858 440 8846.0 446.0Q8834 452 8819 453Q8814 454 8809.0 454.0Q8804 454 8799 454Q8754 454 8730.0 431.5Q8706 409 8706 364Q8706 358 8706.5 352.0Q8707 346 8708 340Q8709 328 8712.0 316.0Q8715 304 8719 292Q8730 298 8746.5 307.0Q8763 316 8780 328Q8803 344 8823.5 362.5Q8844 381 8853 401Q8855 407 8856.5 412.5Q8858 418 8858 423Z"
+              />
+            </g>
+          </svg>
+        </button>
+        <nav aria-label="Main navigation">
+          <button
+            class="collection-trigger"
+            id="open-collection"
+            aria-label="The sticker collection"
+          >
+            <svg class="icon"><use href="#i-grid" /></svg><span>Collection</span
+            ><span class="count" id="sticker-count">39</span>
+          </button>
+          <button
+            class="icon-button story-trigger"
+            id="open-about"
+            aria-label="The story and how to play"
+            title="The story & controls"
+          >
+            <svg class="icon"><use href="#i-info" /></svg>
+          </button>
+        </nav>
+      </header>
+
+      <aside class="finish-picker" aria-label="Fridge finish">
+        <span class="finish-caption">Finish</span>
+        <div class="swatches" role="group" aria-label="Choose an enamel color">
+          <button
+            class="swatch selected"
+            data-finish="cream"
+            style="--swatch: #e1ddc2"
+            aria-label="Buttermilk finish"
+            aria-pressed="true"
+          >
+            <span></span>
+          </button>
+          <button
+            class="swatch"
+            data-finish="mint"
+            style="--swatch: #91b5a5"
+            aria-label="Sea glass finish"
+            aria-pressed="false"
+          >
+            <span></span>
+          </button>
+          <button
+            class="swatch"
+            data-finish="hunter"
+            style="--swatch: #183b29"
+            aria-label="Hunter green finish"
+            aria-pressed="false"
+          >
+            <span></span>
+          </button>
+        </div>
+        <span id="finish-name">Buttermilk</span>
+      </aside>
+
+      <footer class="bottom-bar">
+        <div class="gesture-guide">
+          <span
+            ><svg class="icon"><use href="#i-peel" /></svg><b>Hold</b> to
+            peel</span
+          ><i></i
+          ><span
+            ><svg class="icon"><use href="#i-move" /></svg><b>Drag</b> to
+            explore</span
+          ><i></i><span class="scroll-hint">Scroll to zoom</span>
+        </div>
+        <button class="sound-toggle" id="sound-toggle" aria-pressed="true">
+          <svg class="icon"><use id="sound-icon" href="#i-volume" /></svg
+          ><span id="sound-label">Sound on</span><span class="sound-led"></span>
+        </button>
+      </footer>
+
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <dialog
+      id="collection-dialog"
+      class="collection-dialog"
+      aria-labelledby="collection-heading"
+    >
+      <div class="drawer-pull" aria-hidden="true"><span></span></div>
+      <div class="drawer-header">
+        <h2 id="collection-heading">Your collection</h2>
+        <button class="icon-button close-dialog" aria-label="Close collection">
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <p class="drawer-description">
+        Drag one out and drop it on the fridge.<br />Or tap to pick, then tap
+        the fridge to place.
+      </p>
+      <div class="collection-filters" role="group" aria-label="Filter stickers">
+        <button class="active" data-filter="all" aria-pressed="true">
+          All <span id="all-count">39</span></button
+        ><button data-filter="bands" aria-pressed="false">
+          Bands <span class="filter-count">15</span></button
+        ><button data-filter="logos" aria-pressed="false">
+          Logos <span class="filter-count">15</span></button
+        ><button data-filter="graphics" aria-pressed="false">
+          Graphics <span class="filter-count">9</span></button
+        ><button
+          data-filter="custom"
+          id="custom-filter"
+          hidden
+          aria-pressed="false"
+        >
+          Yours
+        </button>
+      </div>
+      <div id="sticker-grid" class="sticker-grid"></div>
+      <div class="drawer-footer">
+        <button id="upload-sticker" class="upload-button">
+          <svg class="icon"><use href="#i-upload" /></svg>Add your own
+          sticker<small>PNG, JPG or WEBP</small></button
+        ><input
+          id="sticker-file"
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          hidden
+        /><button id="reset-stickers" class="reset-stickers">
+          <svg class="icon"><use href="#i-reset" /></svg>Start fresh</button
+        ><span class="auto-save-note"
+          >Your fridge is saved on this device.</span
+        >
+      </div>
+    </dialog>
+
+    <dialog id="about-dialog" class="about-dialog">
+      <button class="icon-button close-dialog" aria-label="Close story">
+        <svg class="icon"><use href="#i-close" /></svg>
+      </button>
+      <h2>Make it yours.</h2>
+      <p>
+        An interactive fridge for your sticker collection. Move things around,
+        choose a finish, or upload your own artwork.
+      </p>
+      <div class="how-to">
+        <div>
+          <svg class="icon"><use href="#i-peel" /></svg
+          ><strong>Peel & place</strong
+          ><span
+            >Hold a sticker, drag it anywhere on the enamel, then let go.</span
+          >
+        </div>
+        <div>
+          <svg class="icon"><use href="#i-move" /></svg
+          ><strong>Have a look around</strong
+          ><span
+            >Drag empty space to orbit. Scroll or pinch to zoom. Right-drag to
+            pan.</span
+          >
+        </div>
+      </div>
+      <div class="keyboard-note">
+        <strong>Keyboard controls</strong> Open the collection and press Enter
+        on a sticker to place or select it. Arrow keys move it, [ and ] rotate
+        it, and Escape cancels a pick. Hold Shift for finer moves. Use + and −
+        to zoom, and click the top-left wordmark to reset the view.
+      </div>
+      <div class="about-fine-print">
+        Reference-led skate and 90s band graphics, classic logos, and strange
+        creatures. Brand artwork belongs to its respective owners. No
+        affiliation.<br /><br />Enamel maps:
+        <a
+          href="https://ambientcg.com/a/PaintedMetal012"
+          target="_blank"
+          rel="noopener noreferrer"
+          >ambientCG</a
+        >
+        · HDRI:
+        <a
+          href="https://polyhaven.com/a/studio_small_09"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Poly Haven</a
+        >
+        · Made with Three.js.
+      </div>
+    </dialog>
+
+    <div id="loader" class="loader" role="status" aria-live="polite">
+      <svg
+        class="loading-fridge"
+        viewBox="0 0 52 68"
+        fill="none"
+        aria-hidden="true"
+      >
+        <rect
+          x="8"
+          y="3"
+          width="36"
+          height="58"
+          rx="9"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+        <path
+          d="M14 22v14M13 62v3m26-3v3"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        />
+        <path d="M24 29h13v12l-6 6h-7V29Z" fill="#e5e5e5" />
+        <path d="M31 47v-6h6" stroke="#20241e" stroke-width="1.3" />
+      </svg>
+      <h2 id="loader-title">Loading your fridge</h2>
+      <p id="loader-description">Preparing textures and stickers</p>
+      <div class="loading-track"><span id="loading-progress"></span></div>
+      <button id="reload" hidden>Try again</button>
+    </div>
+    <noscript
+      ><div class="no-script">
+        This little time capsule needs JavaScript and a WebGL-enabled browser.
+      </div></noscript
+    >
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

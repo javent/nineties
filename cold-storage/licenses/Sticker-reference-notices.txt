@@ -1,0 +1,47 @@
+STICKER ARTWORK — REFERENCE NOTICE
+
+The thirty-nine sticker graphics are adapted from user-supplied photographs and
+matching classic-brand references. They are not original project illustrations,
+not CC0 artwork, and not covered by the CC0 licenses of the fridge PBR/HDRI assets.
+Brand marks and artwork remain the property of their respective owners.
+The project is not affiliated with or endorsed by the depicted brands.
+Attribution does not establish permission for public/commercial redistribution.
+Check the relevant artwork, photograph, and trademark rights before publishing.
+
+TEN PHOTO CUTOUTS
+User-provided image: s-l1200-2.jpg (989 x 1200)
+Pat Duffy, Creature, Rainbow Melt (descriptive/unverified brand label), Vans,
+Toy Machine, Spitfire, Zumiez, Alien Workshop, Journeys, 187 Killer Pads.
+
+FOUR MATCHING REFERENCES
+Direction: user-provided images-8.jpg (387 x 516).
+Santa Cruz Classic Dot:
+https://www.routeone.eu/products/santa-cruz-classic-dot-sticker
+Independent Truck Company logo:
+https://vectorseek.com/vector_logo/independent-truck-company-logo-vector/
+Bullet Dragon Crest (complete red foreground sticker):
+https://i.ebayimg.com/images/g/c40AAeSwf1FqNrlM/s-l1600.jpg
+Santa Cruz Speed Face (blue face isolated from enamel-pin reference):
+https://www.ebay.com/itm/384237988626
+https://i.ebayimg.com/images/g/fZQAAOSw3kVg09vY/s-l1600.jpg
+
+Detailed provenance, adaptation notes, source links, and editable PNG locations
+are provided in STICKER-CREDITS.md in the source archive.
+No statement is made that every pictured design dates to the 1990s.
+
+TEN ADDITIONAL USER-PROVIDED GRAPHICS
+Source: s-l1200-3.jpg (1200 x 903).
+Black Label, Alien Workshop Spectrum, Anti Hero, DVS, Independent Crossbar,
+Plan B, Krux, Element, Krooked, and eS (stylized as éS).
+All ten textures are derived from the user-provided photograph. The existing
+fourteen graphics remain in the set. These additions are not claimed as CC0
+or as original project illustrations. See STICKER-CREDITS.md for details.
+
+FIFTEEN BAND GRAPHICS
+Source: user-provided 90s-bands-sticker-pack.jpg (1024 x 1024).
+Weezer, Soundgarden, Alice in Chains, Foo Fighters, Red Hot Chili Peppers,
+Radiohead, Smashing Pumpkins, Stone Temple Pilots, Oasis, Rage Against the Machine,
+Nirvana, The Offspring, Pearl Jam, R.E.M., and Nine Inch Nails.
+The connected emblem/wordmark backings are preserved. These graphics are not CC0,
+not claimed as original project illustrations, and are not an endorsement.
+See STICKER-CREDITS.md before publishing or commercial redistribution.

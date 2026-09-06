@@ -1,0 +1,20 @@
+{
+  "name": "mid90s-minifridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "standalone": "node tools/standalone.mjs"
+  },
+  "dependencies": {
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "playwright": "^1.55.0",
+    "prettier": "^3.9.6",
+    "vite": "^7.3.1"
+  }
+}

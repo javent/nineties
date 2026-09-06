@@ -1,0 +1,12 @@
+DRAWER WOOD TEXTURE
+
+Asset: ambientCG Wood051, 1K JPG color map.
+Source: https://ambientcg.com/a/Wood051
+Download: https://ambientcg.com/get?file=Wood051_1K-JPG.zip
+License: CC0 1.0 Universal.
+License information: https://docs.ambientcg.com/license/
+Legal text: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+Adaptation: mild brightness/saturation adjustment and optimized JPEG encoding,
+used as the wooden collection drawer's CSS surface.
+The CC0 terms for this material do not apply to the third-party sticker graphics.
