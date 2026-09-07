@@ -1,46 +1,43 @@
-/* The collection is a water-clear plastic compartment tray — the kind sold
- * for beads and fishing tackle. Clear polystyrene reads through its edges:
- * every wall shows as a translucent band bounded by two crisp lit rims, and
- * every cell is a recessed well with the wall's shadow falling in from the
- * top and a glossy floor. One cool top light throughout. */
+/* The collection is a walnut drawer, rendered with early-2000s skeuomorphic
+ * conviction: real wood grain on every surface, routed compartments divided
+ * by wooden slats, beveled hardware, and deep layered shadows. One warm lamp
+ * above and to the left; every edge decides whether it faces it. */
 #collection-dialog {
-  --wall: rgba(213, 228, 245, 0.13);
-  --wall-edge: rgba(233, 242, 252, 0.5);
+  --wood: url("/assets/drawer-wood.jpg");
   z-index: 30;
   width: 458px;
   padding: 18px 24px 30px;
-  color: #f2f5f9;
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  border-right: 0;
-  border-radius: 28px 0 0 28px;
-  background:
-    radial-gradient(
-      120% 55% at 100% 0%,
-      rgba(255, 255, 255, 0.1),
-      transparent 55%
-    ),
+  color: #efe2c8;
+  border: 0;
+  border-left: 12px solid #513620;
+  border-right: 8px solid #3f291a;
+  border-radius: 14px 0 0 14px;
+  background-color: #543b29;
+  background-image:
     linear-gradient(
-      165deg,
-      rgba(255, 255, 255, 0.15),
-      rgba(255, 255, 255, 0.05) 40%,
-      rgba(255, 255, 255, 0.09)
+      90deg,
+      #1b0e0845,
+      transparent 13%,
+      transparent 88%,
+      #160a0750
     ),
-    rgba(20, 24, 31, 0.4);
-  -webkit-backdrop-filter: blur(32px) saturate(1.4);
-  backdrop-filter: blur(32px) saturate(1.4);
+    var(--wood);
+  background-size:
+    100% 100%,
+    520px 520px;
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.45),
-    inset 2px 0 0 rgba(255, 255, 255, 0.18),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
-    inset 0 -42px 54px -46px rgba(0, 0, 0, 0.5),
-    -30px 0 70px rgba(0, 0, 0, 0.55);
+    inset 9px 0 18px #160a0870,
+    inset -5px 0 13px #10070470,
+    inset 0 2px 0 #d2ba884d,
+    -8px 0 18px #000a,
+    -30px 0 65px #000b;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+  scrollbar-color: #a88c62 #332215;
   scroll-behavior: auto;
   touch-action: pan-y;
   overscroll-behavior: contain;
 }
-/* The clear lid band, closing just above the header. */
+/* The varnished top rail, parted from the body by a routed groove. */
 #collection-dialog::before {
   content: "";
   display: block;
@@ -48,19 +45,16 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 58px;
-  border-radius: 28px 0 0 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0.07) 78%,
-    rgba(255, 255, 255, 0.02)
-  );
+  height: 56px;
+  border-radius: 14px 0 0 0;
+  border-bottom: 1px solid #241209;
+  background:
+    linear-gradient(180deg, #c1a17752, #4a2d1b3d 70%, #2c190e33),
+    var(--wood) center/500px;
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -8px 14px -8px rgba(0, 0, 0, 0.38),
-    0 1px 0 rgba(255, 255, 255, 0.14);
+    inset 0 2px 0 #e5cf9c55,
+    inset 0 -6px 10px -6px #12070473,
+    0 1px 0 #d2ba8840;
   pointer-events: none;
 }
 #collection-dialog.is-opening {
@@ -97,18 +91,19 @@
   position: relative;
   z-index: 1;
 }
-/* "stickers", etched into the plastic: the glyphs read as a recess — darker
- * than the shell, dark upper lip, a thin light catch along the bottom edge. */
+/* "stickers", branded into the rail: charred glyphs, a chisel-dark upper lip,
+ * and the grain catching light along the bottom of each cut. */
 #collection-dialog h2 {
   margin: 0;
-  color: rgba(10, 13, 18, 0.42);
+  color: #2c1a0e;
   font: 700 22px/1.2 var(--sans);
   letter-spacing: 2.5px;
   text-transform: lowercase;
   text-shadow:
-    0 -1px 1px rgba(0, 0, 0, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.32);
+    0 -1px 1px rgba(12, 5, 2, 0.55),
+    0 1px 0 rgba(226, 198, 140, 0.4);
 }
+/* Beveled wooden pushbuttons with brass-warm faces. */
 #collection-dialog .icon-button {
   flex: 0 0 auto;
   width: 36px;
@@ -117,38 +112,38 @@
   padding: 0;
   display: grid;
   place-items: center;
-  border-radius: 11px;
-  color: #eef2f8;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.16),
-    rgba(255, 255, 255, 0.06)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 9px;
+  color: #efe2c8;
+  background:
+    linear-gradient(180deg, #7d593b, #5b3f2a 60%, #4c3322),
+    var(--wood) center/220px;
+  background-blend-mode: multiply, normal;
+  border: 1px solid #35220f;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 3px 6px rgba(0, 0, 0, 0.4);
+    inset 0 1px 0 #e2c68c52,
+    inset 1px 0 0 #d8bd8a2b,
+    inset 0 -3px 4px #1c0f0866,
+    0 3px 6px #000a;
 }
 #collection-dialog .icon-button:hover {
-  color: #ffffff;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.22),
-    rgba(255, 255, 255, 0.1)
-  );
+  color: #fff4df;
+  background:
+    linear-gradient(180deg, #8a6543, #684a31 60%, #563a26),
+    var(--wood) center/220px;
+  background-blend-mode: multiply, normal;
 }
 #collection-dialog .icon-button:active {
   transform: translateY(1px);
   box-shadow:
-    inset 0 2px 5px rgba(0, 0, 0, 0.45),
-    0 1px 2px rgba(0, 0, 0, 0.3);
+    inset 0 2px 5px #12080485,
+    0 1px 2px #0008;
 }
 #collection-dialog .icon-button .icon {
   width: 15px;
   height: 15px;
 }
-/* ——— Print station: the upload button doubles as a sticker printer. On
- *     upload, a slot opens across its top and the new sticker feeds out. ——— */
+/* ——— Print station: a routed slot in the wood. On upload, the slit opens
+ *     and the new sticker feeds out. ——— */
 #collection-dialog .print-station {
   position: relative;
   margin: 12px 0 18px;
@@ -169,10 +164,10 @@
   top: 6px;
   height: 5px;
   border-radius: 3px;
-  background: linear-gradient(180deg, #05070a, #181c22);
+  background: linear-gradient(180deg, #0a0502, #211107);
   box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.9),
-    0 1px 0 rgba(255, 255, 255, 0.18);
+    inset 0 1px 2px rgba(5, 2, 0, 0.95),
+    0 1px 0 #d8bd8a3d;
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -197,7 +192,7 @@
   pointer-events: none;
   display: none;
   z-index: 3;
-  filter: drop-shadow(0 7px 9px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 7px 9px rgba(8, 3, 1, 0.6));
 }
 #collection-dialog .print-station.is-printing .print-out {
   display: block;
@@ -222,24 +217,24 @@
     transform: translateY(14px);
   }
 }
-/* Freshly filed cell glows for a beat so the eye lands with it. */
+/* Freshly filed compartment glows warm for a beat so the eye lands with it. */
 #collection-dialog .sticker-card.just-printed {
   animation: fresh-print 1.4s ease-out;
 }
 @keyframes fresh-print {
   0% {
-    background: rgba(255, 255, 255, 0.35);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
+    background-color: rgba(240, 208, 140, 0.5);
+    box-shadow: 0 0 0 2px rgba(240, 208, 140, 0.6);
   }
   100% {
-    background: rgba(4, 6, 10, 0.26);
-    box-shadow: inset 0 7px 10px -5px rgba(0, 0, 0, 0.6);
+    background-color: rgba(14, 7, 3, 0.34);
+    box-shadow: inset 0 9px 12px -6px rgba(8, 3, 1, 0.8);
   }
 }
-/* ——— THE TRAY. A clear compartment box: an outer rim wall, thin divider
- *     walls between every cell (the grid's gaps ARE the wall tops — a
- *     translucent band edged by the two adjacent cells' lit rims), and
- *     recessed wells with glossy floors. ——— */
+/* ——— THE DRAWER TRAY. A type-case insert: routed compartments divided by
+ *     wooden slats. The grid's gaps ARE the slat tops — grain bands edged by
+ *     the two neighbouring compartments' lit rims — and every cell is a
+ *     darker routed well with the slat's shadow falling in from above. ——— */
 #sticker-grid {
   position: relative;
   grid-template-columns: repeat(3, 1fr);
@@ -247,39 +242,35 @@
   padding: 7px;
   margin: 8px 2px 4px;
   /* A real tray is never perfectly face-on: a whisper of perspective lets
-   * the divider walls read with actual depth as the tray recedes upward. */
+   * the divider slats read with actual depth as the tray recedes upward. */
   transform: perspective(1100px) rotateX(3.5deg);
   transform-origin: 50% 0;
   background:
-    linear-gradient(
-      165deg,
-      rgba(255, 255, 255, 0.06),
-      rgba(255, 255, 255, 0) 55%,
-      rgba(255, 255, 255, 0.03)
-    ),
-    var(--wall);
-  border: 1px solid var(--wall-edge);
-  border-radius: 13px;
+    linear-gradient(180deg, #d8b57829, #0c060314 55%, #0c060324),
+    var(--wood) center/440px;
+  border: 1px solid #6d4c2f;
+  border-radius: 10px;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 10px 22px rgba(0, 0, 0, 0.45);
+    inset 0 1px 0 #dfc39144,
+    inset 0 0 0 1px #2a180d,
+    0 3px 7px #000a,
+    0 14px 28px #000908c9;
 }
-/* The raised outer rim of the box, standing a little proud of the walls. */
+/* The raised outer frame of the insert, standing proud of the slats. */
 #sticker-grid::before {
   content: "";
   position: absolute;
   inset: -6px;
-  border-radius: 18px;
-  border: 1px solid rgba(233, 242, 252, 0.42);
+  border-radius: 14px;
+  border: 1px solid #7c5836;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
-    0 7px 16px rgba(0, 0, 0, 0.4);
+    inset 0 1px 0 #dfc39136,
+    inset 0 0 0 1px #241207,
+    0 9px 20px #000c;
   pointer-events: none;
 }
-/* Each cell is a molded well: the divider wall's lit rim runs around it, its
- * shadow falls in from the top, light bounces off the glossy floor below. */
+/* Each compartment: a routed well in darker wood; the slat's lit rim runs
+ * around it, its shadow falls in from the top, grain shows on the floor. */
 #collection-dialog .sticker-card {
   cursor: grab;
   touch-action: none;
@@ -289,26 +280,28 @@
   position: relative;
   padding: 4px;
   gap: 0;
-  border-radius: 7px;
+  border-radius: 6px;
   border: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.32),
-    rgba(0, 0, 0, 0.1) 30%,
-    rgba(0, 0, 0, 0.18) 72%,
-    rgba(255, 255, 255, 0.04)
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 5, 2, 0.52),
+      rgba(12, 5, 2, 0.24) 30%,
+      rgba(12, 5, 2, 0.36) 72%,
+      rgba(96, 62, 36, 0.28)
+    ),
+    var(--wood) center/300px;
   box-shadow:
-    0 0 0 1px var(--wall-edge),
-    inset 0 8px 11px -6px rgba(0, 0, 0, 0.65),
-    inset 0 -5px 9px -5px rgba(255, 255, 255, 0.12),
-    inset 5px 0 9px -6px rgba(0, 0, 0, 0.4),
-    inset -5px 0 9px -6px rgba(255, 255, 255, 0.08);
+    0 0 0 1px rgba(216, 189, 138, 0.32),
+    inset 0 9px 12px -6px rgba(8, 3, 1, 0.85),
+    inset 0 -5px 9px -5px rgba(226, 198, 140, 0.13),
+    inset 6px 0 10px -6px rgba(8, 3, 1, 0.55),
+    inset -6px 0 10px -6px rgba(226, 198, 140, 0.08);
   transition:
     background 0.18s,
     box-shadow 0.18s;
 }
-/* A soft specular streak across the well floor. */
+/* Varnish catching the lamp across the well floor. */
 #collection-dialog .sticker-card::after {
   content: "";
   position: absolute;
@@ -317,27 +310,29 @@
   background: linear-gradient(
     118deg,
     transparent 40%,
-    rgba(255, 255, 255, 0.06) 47%,
-    rgba(255, 255, 255, 0.015) 53%,
+    rgba(255, 238, 200, 0.06) 47%,
+    rgba(255, 238, 200, 0.015) 53%,
     transparent 62%
   );
   pointer-events: none;
 }
 #collection-dialog .sticker-card:hover,
 #collection-dialog .sticker-card.is-held {
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.2),
-    rgba(255, 255, 255, 0.02) 30%,
-    rgba(0, 0, 0, 0.1) 72%,
-    rgba(255, 255, 255, 0.06)
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 5, 2, 0.36),
+      rgba(30, 16, 8, 0.16) 30%,
+      rgba(12, 5, 2, 0.22) 72%,
+      rgba(110, 74, 44, 0.3)
+    ),
+    var(--wood) center/300px;
   box-shadow:
-    0 0 0 1px rgba(240, 247, 255, 0.7),
-    inset 0 8px 11px -6px rgba(0, 0, 0, 0.55),
-    inset 0 -5px 9px -5px rgba(255, 255, 255, 0.14),
-    inset 5px 0 9px -6px rgba(0, 0, 0, 0.35),
-    inset -5px 0 9px -6px rgba(255, 255, 255, 0.1);
+    0 0 0 1px rgba(232, 206, 150, 0.55),
+    inset 0 9px 12px -6px rgba(8, 3, 1, 0.7),
+    inset 0 -5px 9px -5px rgba(226, 198, 140, 0.16),
+    inset 6px 0 10px -6px rgba(8, 3, 1, 0.45),
+    inset -6px 0 10px -6px rgba(226, 198, 140, 0.1);
 }
 #collection-dialog .sticker-card.is-held {
   cursor: grabbing;
@@ -357,7 +352,7 @@
   pointer-events: none;
   filter: drop-shadow(1.5px 1.5px 0 rgba(236, 239, 244, 0.95))
     drop-shadow(1.5px 2px 0 rgba(188, 195, 205, 0.9))
-    drop-shadow(0 3px 3px rgba(0, 0, 0, 0.5));
+    drop-shadow(0 3px 3px rgba(8, 3, 1, 0.6));
   transform: rotate(-3deg);
   transition:
     transform 0.18s,
@@ -382,7 +377,7 @@
   transform: translateY(-5px) rotate(-1deg);
   filter: drop-shadow(1.5px 1.5px 0 rgba(236, 239, 244, 0.95))
     drop-shadow(1.5px 2px 0 rgba(188, 195, 205, 0.9))
-    drop-shadow(0 11px 10px rgba(0, 0, 0, 0.6));
+    drop-shadow(0 11px 10px rgba(8, 3, 1, 0.65));
 }
 #collection-dialog .sticker-card.is-on-fridge .sticker-preview img {
   opacity: 0.75;
@@ -397,19 +392,19 @@
   content: "✓";
   right: 2px;
   bottom: 0;
-  color: #e9f2ee;
+  color: #e8d5a8;
   font-size: 11px;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  text-shadow: 0 0 7px rgba(226, 198, 140, 0.45);
 }
-/* Cell numbers, molded into the floor like the part numbers on real trays. */
+/* Compartment numbers, stenciled into the wood like a print shop's case. */
 #collection-dialog .sticker-number {
-  color: rgba(8, 11, 16, 0.5);
+  color: rgba(18, 9, 4, 0.6);
   font-size: 7px;
   left: 5px;
   top: 3px;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
+  text-shadow: 0 1px 0 rgba(226, 198, 140, 0.3);
 }
-/* No captions in a real tray: the name is molded into the well floor and
+/* No captions in a real drawer: the name is carved into the well floor and
  * only catches the light when you reach in (hover / keyboard focus). */
 #collection-dialog .sticker-card-label {
   position: absolute;
@@ -417,13 +412,13 @@
   right: 6px;
   bottom: 4px;
   justify-content: center;
-  color: rgba(10, 13, 18, 0.55);
+  color: rgba(20, 10, 4, 0.68);
   font-size: 8.5px;
   font-weight: 700;
   letter-spacing: 0.4px;
   line-height: 1.2;
   text-align: center;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.28);
+  text-shadow: 0 1px 0 rgba(226, 198, 140, 0.35);
   opacity: 0;
   transition: opacity 0.16s;
   pointer-events: none;
@@ -436,52 +431,51 @@
   display: none;
 }
 #collection-dialog .sticker-card:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.65);
+  outline: 2px solid #e8cfa0;
   outline-offset: 2px;
 }
 #collection-dialog .drawer-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid #d8b58436;
   margin-top: 26px;
   padding-top: 18px;
   gap: 17px 10px;
 }
 #collection-dialog .upload-button {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.16),
-    rgba(255, 255, 255, 0.06)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  color: #eef3f8;
+  background:
+    linear-gradient(180deg, #7d593b, #5b3f2a 60%, #4c3322),
+    var(--wood) center/300px;
+  background-blend-mode: multiply, normal;
+  border: 1px solid #35220f;
+  color: #efe2c8;
   font-size: 11px;
-  border-radius: 14px;
+  border-radius: 10px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 3px 6px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 #e2c68c52,
+    inset 0 -3px 4px #1c0f0866,
+    0 3px 6px #000a;
 }
 #collection-dialog .upload-button:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.23),
-    rgba(255, 255, 255, 0.11)
-  );
-  border-color: rgba(255, 255, 255, 0.5);
+  background:
+    linear-gradient(180deg, #8a6543, #684a31 60%, #563a26),
+    var(--wood) center/300px;
+  background-blend-mode: multiply, normal;
+  border-color: #493118;
 }
 #collection-dialog .upload-button:active {
   transform: translateY(1px);
   box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.4),
-    0 1px 2px rgba(0, 0, 0, 0.3);
+    inset 0 2px 5px #12080485,
+    0 1px 2px #0008;
 }
 #collection-dialog .upload-button small {
-  color: rgba(238, 243, 248, 0.55);
+  color: #c9ad82;
   font-size: 7px;
 }
 #collection-dialog .reset-stickers {
-  color: rgba(238, 243, 248, 0.8);
+  color: #e6cfa5;
 }
 #collection-dialog .auto-save-note {
-  color: rgba(236, 242, 248, 0.5);
+  color: #c2a87e;
   font-size: 9px;
 }
 /* Raised middle creases and edge curl. All paper pieces share the Revue outline. */
@@ -533,7 +527,8 @@
   #collection-dialog {
     width: 100%;
     padding: 17px 17px 26px;
-    border: 0;
+    border-left-width: 8px;
+    border-right-width: 7px;
     border-radius: 0;
   }
   #collection-dialog::before {
