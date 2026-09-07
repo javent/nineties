@@ -289,6 +289,13 @@ export class TactileAudio {
       gain.disconnect();
     };
   }
+  trash() {
+    if (!this.enabled || !this.context) return;
+    // A tin-can plonk with a little paper crumple on top.
+    this.thump(210, 62, 0.12, 0.12);
+    this.noiseBurst(0.02, 0.1, 1500, 0.08, 1.2);
+    this.noiseBurst(0.1, 0.06, 900, 0.05);
+  }
   printer() {
     if (!this.enabled || !this.context) return;
     // A little thermal-printer chatter: quick ticks while the sheet feeds.

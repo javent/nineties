@@ -81,6 +81,11 @@
         <symbol id="i-check" viewBox="0 0 24 24">
           <path d="m5 12 4 4L19 6" />
         </symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24">
+          <path
+            d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m3 0-1 13a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1L6 7m4 4v6m4-6v6"
+          />
+        </symbol>
       </defs>
     </svg>
 
@@ -180,6 +185,9 @@
       </footer>
 
       <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <div id="trash-zone" aria-hidden="true">
+        <svg class="icon"><use href="#i-trash" /></svg>
+      </div>
       <div id="slime" aria-hidden="true"></div>
       <div id="flash" aria-hidden="true"></div>
     </main>

@@ -229,6 +229,63 @@ assert.equal(
   39,
 );
 console.log("Click-to-place ✓");
+// Pulling a sticker off the fridge summons the bin; dropping it there takes
+// it off the fridge and back into the tray.
+dest = await surface(page, 0.3, -0.75);
+await page.mouse.move(dest.x, dest.y);
+await page.mouse.down();
+await page.waitForTimeout(200);
+await tick(page, 5);
+const bin = await page.evaluate(() => {
+  const r = document.querySelector("#trash-zone").getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+});
+await page.mouse.move(bin.x, bin.y, { steps: 6 });
+await tick(page, 10);
+assert.equal(
+  await page.evaluate(() =>
+    document.querySelector("#trash-zone").classList.contains("visible"),
+  ),
+  true,
+);
+assert.equal(
+  await page.evaluate(() =>
+    document.querySelector("#trash-zone").classList.contains("hot"),
+  ),
+  true,
+);
+await page.mouse.up();
+await tick(page, 20);
+assert.equal(
+  await page.evaluate(
+    () => mid90sMinifridge.stickers.find("band-radiohead").placed,
+  ),
+  false,
+);
+assert.equal(
+  await page.evaluate(() =>
+    document.querySelector("#trash-zone").classList.contains("visible"),
+  ),
+  false,
+);
+assert.equal(
+  await page.evaluate(() => mid90sMinifridge.interaction.busy),
+  false,
+);
+console.log("Trash to tray ✓");
+// Put it back for the persistence stages downstream that expect it placed.
+p = await card(page, "band-radiohead");
+await page.mouse.click(p.x, p.y);
+await page.waitForTimeout(320);
+dest = await surface(page, 0.3, -0.75);
+await page.mouse.click(dest.x, dest.y);
+await tick(page);
+assert.equal(
+  await page.evaluate(
+    () => mid90sMinifridge.stickers.find("band-radiohead").placed,
+  ),
+  true,
+);
 // The upload button is a printer: feed a file in, the sticker prints out and
 // files itself into the alphabetized tray while the drawer stays open.
 await page.locator("#open-collection").click();

@@ -133,7 +133,7 @@ export class Interaction {
       }
     }
     this.audio.peel();
-    this.callbacks.drag?.(true, sticker, this.active.valid);
+    this.callbacks.drag?.(true, sticker, this.active.valid, event);
   }
   placeFromCollectionKeyboard(sticker) {
     this.cancel();
@@ -290,7 +290,7 @@ export class Interaction {
     this.stickers.bringToFront(active.sticker);
     this.canvas.classList.add("is-dragging");
     this.audio.peel();
-    this.callbacks.drag?.(true, active.sticker, true);
+    this.callbacks.drag?.(true, active.sticker, true, active.lastEvent);
   }
   move(event) {
     if (this.suspended) return;
@@ -386,7 +386,7 @@ export class Interaction {
         }
       }
     }
-    this.callbacks.drag?.(true, s, a.valid);
+    this.callbacks.drag?.(true, s, a.valid, event);
   }
   up(event) {
     if (this.suspended) return;
@@ -397,6 +397,17 @@ export class Interaction {
     const s = a.sticker;
     if (a.started) {
       this.moveActive(event);
+      // Off the fridge and over the bin: the sticker goes back to the tray.
+      if (!a.valid && this.callbacks.trash?.(event, s)) {
+        s.dragging = false;
+        s.isOffSurface = false;
+        s.angle = a.angle;
+        s.setPlacement(a.original);
+        s.setPlaced(false);
+        this.stickers.onChange();
+        this.finishActive();
+        return;
+      }
       s.dragging = false;
       s.isOffSurface = false;
       s.setPlacement(a.valid ? a.lastValid : a.original);

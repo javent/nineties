@@ -664,8 +664,36 @@ async function init() {
   setFinish(previous?.finish || "cream");
   portal = createPortal(app.renderer);
   app.scene.add(portal.group);
+  // The bin rises whenever a drag leaves the fridge; dropping there sends the
+  // sticker back to the tray. Manual hit-testing keeps the zone from ever
+  // intercepting pointer events itself.
+  const overTrash = (event) => {
+    const zone = $("#trash-zone");
+    if (!zone || !event) return false;
+    const r = zone.getBoundingClientRect(),
+      slop = 16;
+    return (
+      event.clientX >= r.left - slop &&
+      event.clientX <= r.right + slop &&
+      event.clientY >= r.top - slop &&
+      event.clientY <= r.bottom + slop
+    );
+  };
   interaction = new Interaction(app, fridge, stickers, audio, {
     handleClick: () => enterField(),
+    drag: (dragging, sticker, valid, event) => {
+      const zone = $("#trash-zone");
+      if (!zone) return;
+      const show = !!dragging && !valid;
+      zone.classList.toggle("visible", show);
+      zone.classList.toggle("hot", show && overTrash(event));
+    },
+    trash: (event) => {
+      if (!overTrash(event)) return false;
+      audio.trash();
+      toast("Back in the tray.");
+      return true;
+    },
   });
   drawer = new CollectionDrawer($("#collection-dialog"), interaction, {
     reducedMotion,
