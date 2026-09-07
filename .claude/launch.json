@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "minifridge",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "cold-storage", "--", "--port", "5197", "--strictPort"],
+      "port": 5197
+    },
+    {
+      "name": "minifridge-b",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "cold-storage", "--", "--port", "5193", "--strictPort"],
+      "port": 5193
+    }
+  ]
+}

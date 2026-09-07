@@ -1,35 +1,38 @@
-/* The collection is a Caboodles-style plastic kit case rendered as modern
- * liquid glass. One light source, from the top: every raised edge catches it
- * on top and shades underneath, and the sticker tray is a molded lattice of
- * real compartments — raised dividers, recessed wells. */
+/* The collection is a water-clear plastic compartment tray — the kind sold
+ * for beads and fishing tackle. Clear polystyrene reads through its edges:
+ * every wall shows as a translucent band bounded by two crisp lit rims, and
+ * every cell is a recessed well with the wall's shadow falling in from the
+ * top and a glossy floor. One cool top light throughout. */
 #collection-dialog {
+  --wall: rgba(213, 228, 245, 0.13);
+  --wall-edge: rgba(233, 242, 252, 0.5);
   z-index: 30;
   width: 458px;
   padding: 18px 24px 30px;
   color: #f2f5f9;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.38);
   border-right: 0;
   border-radius: 28px 0 0 28px;
   background:
     radial-gradient(
       120% 55% at 100% 0%,
-      rgba(255, 255, 255, 0.09),
+      rgba(255, 255, 255, 0.1),
       transparent 55%
     ),
     linear-gradient(
       165deg,
-      rgba(255, 255, 255, 0.11),
-      rgba(255, 255, 255, 0.03) 40%,
-      rgba(255, 255, 255, 0.07)
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0.05) 40%,
+      rgba(255, 255, 255, 0.09)
     ),
-    rgba(22, 24, 29, 0.6);
-  -webkit-backdrop-filter: blur(26px) saturate(1.5);
-  backdrop-filter: blur(26px) saturate(1.5);
+    rgba(20, 24, 31, 0.4);
+  -webkit-backdrop-filter: blur(32px) saturate(1.4);
+  backdrop-filter: blur(32px) saturate(1.4);
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.32),
-    inset 2px 0 0 rgba(255, 255, 255, 0.14),
-    inset 0 0 0 7px rgba(255, 255, 255, 0.045),
-    inset 0 -46px 60px -48px rgba(0, 0, 0, 0.55),
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    inset 2px 0 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    inset 0 -42px 54px -46px rgba(0, 0, 0, 0.5),
     -30px 0 70px rgba(0, 0, 0, 0.55);
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
@@ -37,7 +40,7 @@
   touch-action: pan-y;
   overscroll-behavior: contain;
 }
-/* The clear plastic "lid" band of the case, closing just above the header. */
+/* The clear lid band, closing just above the header. */
 #collection-dialog::before {
   content: "";
   display: block;
@@ -47,17 +50,17 @@
   right: 0;
   height: 58px;
   border-radius: 28px 0 0 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.38);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.16),
-    rgba(255, 255, 255, 0.06) 78%,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.07) 78%,
     rgba(255, 255, 255, 0.02)
   );
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -8px 14px -8px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.12);
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -8px 14px -8px rgba(0, 0, 0, 0.38),
+    0 1px 0 rgba(255, 255, 255, 0.14);
   pointer-events: none;
 }
 /* Liquid sheen drifting across the shell. */
@@ -70,7 +73,7 @@
   background: linear-gradient(
     115deg,
     transparent 30%,
-    rgba(255, 255, 255, 0.085) 42%,
+    rgba(255, 255, 255, 0.09) 42%,
     rgba(255, 255, 255, 0.02) 50%,
     transparent 62%
   );
@@ -110,7 +113,7 @@
     transform: translateX(103%);
   }
 }
-/* The chunky latch: molded, lit from above, throwing shade on the lid. */
+/* The clear clasp, front and center like the real thing. */
 .drawer-pull {
   height: 26px;
   display: flex;
@@ -128,7 +131,7 @@
     180deg,
     rgba(255, 255, 255, 0.55),
     rgba(255, 255, 255, 0.22) 45%,
-    rgba(190, 198, 206, 0.28) 58%,
+    rgba(196, 210, 224, 0.28) 58%,
     rgba(255, 255, 255, 0.38)
   );
   border: 1px solid rgba(255, 255, 255, 0.55);
@@ -188,20 +191,20 @@
   color: #eef2f8;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.14),
-    rgba(255, 255, 255, 0.05)
+    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0.06)
   );
-  border: 1px solid rgba(255, 255, 255, 0.26);
+  border: 1px solid rgba(255, 255, 255, 0.32);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
     0 3px 6px rgba(0, 0, 0, 0.4);
 }
 #collection-dialog .icon-button:hover {
   color: #ffffff;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.2),
-    rgba(255, 255, 255, 0.09)
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.1)
   );
 }
 #collection-dialog .icon-button:active {
@@ -218,7 +221,7 @@
  *     upload, a slot opens across its top and the new sticker feeds out. ——— */
 #collection-dialog .print-station {
   position: relative;
-  margin: 12px 0 14px;
+  margin: 12px 0 18px;
   z-index: 2;
 }
 #collection-dialog .print-station .upload-button {
@@ -295,73 +298,117 @@
 }
 @keyframes fresh-print {
   0% {
-    background: rgba(255, 255, 255, 0.32);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
   }
   100% {
-    background: rgba(5, 6, 10, 0.3);
-    box-shadow: inset 0 4px 9px rgba(0, 0, 0, 0.5);
+    background: rgba(4, 6, 10, 0.26);
+    box-shadow: inset 0 7px 10px -5px rgba(0, 0, 0, 0.6);
   }
 }
-/* ——— The tray: a raised molded lattice; every sticker sits in its own
- *     recessed well between real divider walls. ——— */
+/* ——— THE TRAY. A clear compartment box: an outer rim wall, thin divider
+ *     walls between every cell (the grid's gaps ARE the wall tops — a
+ *     translucent band edged by the two adjacent cells' lit rims), and
+ *     recessed wells with glossy floors. ——— */
 #sticker-grid {
   position: relative;
-  gap: 11px;
-  padding: 11px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  padding: 7px;
   background:
     linear-gradient(
-      170deg,
-      rgba(255, 255, 255, 0.13),
-      rgba(255, 255, 255, 0.05) 55%,
-      rgba(255, 255, 255, 0.09)
+      165deg,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0) 55%,
+      rgba(255, 255, 255, 0.03)
     ),
-    rgba(34, 37, 48, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+    var(--wall);
+  border: 1px solid var(--wall-edge);
+  border-radius: 13px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 10px 22px rgba(0, 0, 0, 0.45);
+}
+/* The raised outer rim of the box, standing a little proud of the walls. */
+#sticker-grid::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 18px;
+  border: 1px solid rgba(233, 242, 252, 0.42);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 6px 14px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.06);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 7px 16px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
 }
+/* Each cell is a molded well: the divider wall's lit rim runs around it, its
+ * shadow falls in from the top, light bounces off the glossy floor below. */
 #collection-dialog .sticker-card {
   cursor: grab;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-  padding: 8px 8px 11px;
-  gap: 6px;
-  border-radius: 13px;
+  position: relative;
+  padding: 5px 5px 8px;
+  gap: 4px;
+  border-radius: 7px;
+  border: 0;
   background: linear-gradient(
     180deg,
-    rgba(5, 6, 10, 0.42),
-    rgba(5, 6, 10, 0.22) 30%,
-    rgba(5, 6, 10, 0.3)
+    rgba(0, 0, 0, 0.32),
+    rgba(0, 0, 0, 0.1) 30%,
+    rgba(0, 0, 0, 0.18) 72%,
+    rgba(255, 255, 255, 0.04)
   );
-  border: 1px solid rgba(0, 0, 0, 0.45);
-  border-bottom-color: rgba(255, 255, 255, 0.07);
   box-shadow:
-    inset 0 4px 9px rgba(0, 0, 0, 0.5),
-    inset 0 -2px 5px rgba(255, 255, 255, 0.05),
-    0 1px 0 rgba(255, 255, 255, 0.14);
-  transition: background 0.18s;
+    0 0 0 1px var(--wall-edge),
+    inset 0 8px 11px -6px rgba(0, 0, 0, 0.65),
+    inset 0 -5px 9px -5px rgba(255, 255, 255, 0.12),
+    inset 5px 0 9px -6px rgba(0, 0, 0, 0.4),
+    inset -5px 0 9px -6px rgba(255, 255, 255, 0.08);
+  transition:
+    background 0.18s,
+    box-shadow 0.18s;
+}
+/* A soft specular streak across the well floor. */
+#collection-dialog .sticker-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    118deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.06) 47%,
+    rgba(255, 255, 255, 0.015) 53%,
+    transparent 62%
+  );
+  pointer-events: none;
 }
 #collection-dialog .sticker-card:hover,
 #collection-dialog .sticker-card.is-held {
   background: linear-gradient(
     180deg,
-    rgba(5, 6, 10, 0.3),
-    rgba(16, 18, 26, 0.18) 30%,
-    rgba(16, 18, 26, 0.24)
+    rgba(0, 0, 0, 0.2),
+    rgba(255, 255, 255, 0.02) 30%,
+    rgba(0, 0, 0, 0.1) 72%,
+    rgba(255, 255, 255, 0.06)
   );
+  box-shadow:
+    0 0 0 1px rgba(240, 247, 255, 0.7),
+    inset 0 8px 11px -6px rgba(0, 0, 0, 0.55),
+    inset 0 -5px 9px -5px rgba(255, 255, 255, 0.14),
+    inset 5px 0 9px -6px rgba(0, 0, 0, 0.35),
+    inset -5px 0 9px -6px rgba(255, 255, 255, 0.1);
 }
 #collection-dialog .sticker-card.is-held {
   cursor: grabbing;
 }
 #collection-dialog .sticker-preview {
-  height: 126px;
+  height: 88px;
   background: none;
   border: 0;
   border-radius: 0;
@@ -370,10 +417,10 @@
   transform: none;
 }
 #collection-dialog .sticker-preview img {
-  width: 86%;
-  height: 82%;
+  width: 88%;
+  height: 84%;
   pointer-events: none;
-  filter: drop-shadow(0 6px 7px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.55));
   transform: rotate(-3deg);
   transition:
     transform 0.18s,
@@ -386,7 +433,7 @@
 #collection-dialog .sticker-card:hover .sticker-preview img,
 #collection-dialog .sticker-card.is-held .sticker-preview img {
   transform: translateY(-3px) rotate(-1deg);
-  filter: drop-shadow(0 11px 12px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 9px 10px rgba(0, 0, 0, 0.6));
 }
 #collection-dialog .sticker-card.is-on-fridge .sticker-preview img {
   opacity: 0.75;
@@ -399,57 +446,60 @@
 }
 #collection-dialog .sticker-card.is-on-fridge .sticker-preview::after {
   content: "✓";
-  right: 3px;
+  right: 2px;
   bottom: 0;
   color: #e9f2ee;
-  font-size: 13px;
+  font-size: 11px;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
+/* Cell numbers, molded into the floor like the part numbers on real trays. */
 #collection-dialog .sticker-number {
-  color: rgba(233, 240, 248, 0.5);
-  font-size: 8px;
-  left: 7px;
-  top: 4px;
+  color: rgba(8, 11, 16, 0.5);
+  font-size: 7px;
+  left: 5px;
+  top: 3px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 #collection-dialog .sticker-card-label {
   color: #f2f5f9;
-  font-size: 11px;
-  line-height: 1.45;
-  gap: 5px;
+  font-size: 9.5px;
+  line-height: 1.35;
+  gap: 4px;
+  padding: 0 2px;
 }
 #collection-dialog .sticker-card-label small {
   color: rgba(233, 240, 248, 0.55);
-  font-size: 8px;
+  font-size: 7px;
 }
 #collection-dialog .sticker-card:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.65);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 #collection-dialog .drawer-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
-  margin-top: 22px;
+  margin-top: 26px;
   padding-top: 18px;
   gap: 17px 10px;
 }
 #collection-dialog .upload-button {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.16),
     rgba(255, 255, 255, 0.06)
   );
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.32);
   color: #eef3f8;
   font-size: 11px;
   border-radius: 14px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
     0 3px 6px rgba(0, 0, 0, 0.35);
 }
 #collection-dialog .upload-button:hover {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.22),
-    rgba(255, 255, 255, 0.1)
+    rgba(255, 255, 255, 0.23),
+    rgba(255, 255, 255, 0.11)
   );
   border-color: rgba(255, 255, 255, 0.5);
 }
@@ -528,21 +578,18 @@
   #collection-dialog h2 {
     font-size: 20px;
   }
-  #collection-dialog .drawer-description {
-    font-size: 12px;
-  }
   #sticker-grid {
-    padding: 10px;
-    gap: 10px;
+    gap: 6px;
+    padding: 6px;
   }
   #collection-dialog .sticker-preview {
-    height: 122px;
+    height: 80px;
   }
   #collection-dialog .sticker-card-label {
-    font-size: 10px;
+    font-size: 8.5px;
   }
   #collection-dialog .sticker-card-label small {
-    font-size: 7px;
+    font-size: 6.5px;
   }
 }
 /* On wide screens the open drawer pushes the scene left so the fridge stays in
