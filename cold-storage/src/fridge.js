@@ -33,6 +33,8 @@ export function createFridge(maps) {
     clearcoat: 0.25,
     envMapIntensity: 1.45,
   });
+  // The handle gets its own chrome so a hover glow never spills onto hinges or star.
+  const handleChrome = chrome.clone();
   const dullChrome = new THREE.MeshStandardMaterial({
     color: "#969a8c",
     metalness: 0.9,
@@ -63,26 +65,42 @@ export function createFridge(maps) {
   const cabinet = rounded(3.05, 5.58, 2.22, 0.235, enamel, 0, 0, -0.1, 8);
   cabinet.name = "enamel cabinet";
   meshes.push(cabinet);
-  rounded(2.97, 5.28, 0.095, 0.045, rubber, 0, 0.13, 1.018, 5);
-  rounded(2.99, 5.27, 0.065, 0.031, dullChrome, 0, 0.13, 1.049, 5);
+  const doorParts = [],
+    handleMeshes = [];
+  doorParts.push(rounded(2.97, 5.28, 0.095, 0.045, rubber, 0, 0.13, 1.018, 5));
+  doorParts.push(
+    rounded(2.99, 5.27, 0.065, 0.031, dullChrome, 0, 0.13, 1.049, 5),
+  );
   const door = rounded(2.995, 5.24, 0.38, 0.188, enamel, 0, 0.14, 1.14, 10);
   door.name = "single enamel door";
   meshes.push(door);
-  // Chrome hinges peek past the right-hand door seam.
+  doorParts.push(door);
+  // Chrome hinges peek past the right-hand door seam. They stay with the cabinet.
   rounded(0.1, 0.29, 0.2, 0.045, dullChrome, 1.485, 1.94, 0.99);
   rounded(0.1, 0.29, 0.2, 0.045, dullChrome, 1.485, -1.95, 0.99);
   // Curved chrome handle, with real volume, standoffs and small reflections on its caps.
   for (const y of [0.17, 1.31]) {
-    rounded(0.19, 0.235, 0.06, 0.029, rubber, -1.065, y, 1.358);
-    rounded(0.175, 0.21, 0.085, 0.038, chrome, -1.065, y, 1.39);
+    doorParts.push(rounded(0.19, 0.235, 0.06, 0.029, rubber, -1.065, y, 1.358));
+    const mount = rounded(
+      0.175,
+      0.21,
+      0.085,
+      0.038,
+      handleChrome,
+      -1.065,
+      y,
+      1.39,
+    );
     const pin = new THREE.Mesh(
       new THREE.CylinderGeometry(0.052, 0.055, 0.14, 18),
-      chrome,
+      handleChrome,
     );
     pin.rotation.x = Math.PI / 2;
     pin.position.set(-1.065, y, 1.48);
     pin.castShadow = true;
     group.add(pin);
+    doorParts.push(mount, pin);
+    handleMeshes.push(mount, pin);
   }
   const handleCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(-1.065, 1.34, 1.47),
@@ -94,16 +112,23 @@ export function createFridge(maps) {
   ]);
   const handle = new THREE.Mesh(
     new THREE.TubeGeometry(handleCurve, 48, 0.072, 16, false),
-    chrome,
+    handleChrome,
   );
   handle.castShadow = true;
   handle.receiveShadow = true;
   handle.name = "polished chrome handle";
   group.add(handle);
+  doorParts.push(handle);
+  handleMeshes.push(handle);
   for (const point of [handleCurve.getPoint(0), handleCurve.getPoint(1)]) {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.071, 16, 12), chrome);
+    const cap = new THREE.Mesh(
+      new THREE.SphereGeometry(0.071, 16, 12),
+      handleChrome,
+    );
     cap.position.copy(point);
     group.add(cap);
+    doorParts.push(cap);
+    handleMeshes.push(cap);
   }
   // The lower toe-kick is not a second door. Narrow ventilation slots + polished trim.
   rounded(2.81, 0.23, 0.085, 0.04, dullChrome, 0, -2.65, 1.003);
@@ -125,6 +150,7 @@ export function createFridge(maps) {
   badgeGroup.name = "Centered Evercool manufacturer badge";
   badgeGroup.position.set(0, 2.38, 1.337);
   group.add(badgeGroup);
+  doorParts.push(badgeGroup);
   const [badge, b] = canvas2D(1024, 256);
   b.textAlign = "center";
   b.textBaseline = "middle";
@@ -408,6 +434,25 @@ export function createFridge(maps) {
       .addScaledVector(s.v, placement.v)
       .addScaledVector(s.normal, normalOffset);
   }
+  // Everything mounted on the door (gasket, trim, handle hardware, badge) swings
+  // together on a pivot at the right hinge seam. Attach preserves world transforms,
+  // so at rotation 0 the fridge is pixel-identical to the pre-pivot construction.
+  // While the door is open, the "front" placement surface no longer matches the door
+  // face — callers must suspend sticker interaction until the angle returns to 0.
+  const doorPivot = new THREE.Group();
+  doorPivot.name = "door pivot";
+  doorPivot.position.set(1.4975, 0.14, 1.14);
+  group.add(doorPivot);
+  for (const part of doorParts) doorPivot.attach(part);
+  function setDoorAngle(angle) {
+    if (doorPivot.rotation.y === angle) return false;
+    doorPivot.rotation.y = angle;
+    return true;
+  }
+  function setHandleGlow(t) {
+    handleChrome.emissive.setRGB(0.55, 0.75, 1.0).multiplyScalar(0.35 * t);
+    handleChrome.envMapIntensity = 1.45 + 0.6 * t;
+  }
   let currentFinish = "cream";
   function setFinish(id) {
     id = resolveFinish(id);
@@ -440,6 +485,13 @@ export function createFridge(maps) {
     surfaces,
     meshes,
     enamel,
+    doorPivot,
+    handleMeshes,
+    setDoorAngle,
+    setHandleGlow,
+    get doorAngle() {
+      return doorPivot.rotation.y;
+    },
     // Retain ownership of maps while a smooth finish temporarily stops using them.
     textureResources: Object.values(maps).filter((value) => value?.isTexture),
     fromIntersection,

@@ -6,7 +6,10 @@ import { createFridge, FINISHES, resolveFinish } from "./fridge.js";
 import { StickerManager } from "./stickers.js";
 import { Interaction } from "./interaction.js";
 import { CollectionDrawer } from "./collection-drawer.js";
-import { BrandPeel } from "./brand-peel.js";
+import { createPortal } from "./portal.js";
+import { createFieldWorld } from "./field-world.js";
+import lottie from "lottie-web/build/player/lottie_light";
+import headerSmiley from "./header-smiley.json";
 import { CATALOG, CATALOG_VERSION } from "./sticker-art.js";
 import {
   $,
@@ -32,11 +35,39 @@ let progress = 0,
   stickers,
   interaction,
   drawer,
-  brandPeel,
   frameId,
   disposed = false,
   renderingPaused = false;
 const audio = new TactileAudio();
+// The header smiley draws itself in once, alongside the wordmark. It waits for
+// the loader to lift so the play-through isn't hidden or starved by asset work.
+const brandSmiley = lottie.loadAnimation({
+  container: $("#brand-smiley"),
+  renderer: "svg",
+  loop: false,
+  autoplay: false,
+  animationData: headerSmiley,
+});
+if (reducedMotion) brandSmiley.goToAndStop(brandSmiley.totalFrames, true);
+// The doorway to the Bliss field. One renderer, two worlds; `mode` decides which
+// scene updates and renders each frame.
+let mode = "fridge", // "fridge" | "opening" | "field" | "returning"
+  field = null,
+  portal = null,
+  transition = null;
+const OPEN_ANGLE = 1.83;
+// Approach from slightly left of center: the right-hinged door sweeps toward the
+// viewer's right, so a left-of-center dolly keeps the glowing doorway in view.
+const DOLLY_TO = new THREE.Vector3(-0.3, 0.14, 2.9);
+const DOLLY_LOOK = new THREE.Vector3(0.2, 0.14, 0.9);
+// Entering has no white-out anymore: the doorway is a live window into the
+// field, and the swap fires when it fills the frame. Reduced motion skips the
+// dolly, so it keeps a quick flash to cover its instant cut.
+const TIMES = reducedMotion
+  ? { door: 0.18, flashAt: 0.08, swapAt: 0.45, whiteIn: 0.28, close: 0.18 }
+  : { door: 0.8, flashAt: Infinity, swapAt: 1.7, whiteIn: 0.42, close: 0.6 };
+const easeInOutCubic = (t) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 function report(value) {
   progress = Math.max(progress, value);
   $("#loading-progress").style.width = `${progress}%`;
@@ -113,9 +144,7 @@ function setFinish(id, announce = false) {
     button.setAttribute("aria-pressed", String(active));
   });
   $("#finish-name").textContent = FINISHES[id].name;
-  if (announce) {
-    saveSoon();
-  }
+  if (announce) saveSoon();
 }
 function updateSound() {
   $("#sound-toggle").setAttribute("aria-pressed", String(audio.enabled));
@@ -125,48 +154,22 @@ function updateSound() {
   );
   $("#sound-label").textContent = audio.enabled ? "Sound on" : "Sound off";
 }
-let filter = "all",
-  catalogSignature = "";
+let catalogSignature = "";
 function refreshCollection(force = false) {
-  const signature =
-    stickers.items
-      .map((s) => `${s.id}:${s.placed}`)
-      .sort()
-      .join("|") + filter;
-  const count = stickers.items.length;
-  $("#sticker-count").textContent = count;
-  $("#all-count").textContent = count;
-  for (const category of ["logos", "graphics", "bands"]) {
-    const badge = document.querySelector(
-      `[data-filter="${category}"] .filter-count`,
-    );
-    if (badge)
-      badge.textContent = stickers.items.filter(
-        (s) => s.meta.category === category,
-      ).length;
-  }
-  $("#custom-filter").hidden = !stickers.items.some((s) => s.meta.custom);
+  const signature = stickers.items
+    .map((s) => `${s.id}:${s.placed}`)
+    .sort()
+    .join("|");
+  $("#sticker-count").textContent = stickers.items.length;
   if (!force && signature === catalogSignature) return;
   catalogSignature = signature;
   const grid = $("#sticker-grid");
   grid.replaceChildren();
-  const ordered = [...stickers.items].sort((a, b) => {
-    // Introduce the new collection first without reordering any placed meshes.
-    const priority = (s) =>
-      s.meta.category === "bands"
-        ? 0
-        : s.meta.edition === "mid90s-expansion"
-          ? 1
-          : s.meta.custom
-            ? 3
-            : 2;
-    if (priority(a) !== priority(b)) return priority(a) - priority(b);
-    const ai = CATALOG.findIndex((c) => c.id === a.id),
-      bi = CATALOG.findIndex((c) => c.id === b.id);
-    return (ai < 0 ? 100 : ai) - (bi < 0 ? 100 : bi);
-  });
+  // One flat alphabetical tray — no filters, no category priority.
+  const ordered = [...stickers.items].sort((a, b) =>
+    a.meta.name.localeCompare(b.meta.name, undefined, { sensitivity: "base" }),
+  );
   ordered.forEach((sticker, index) => {
-    if (filter !== "all" && sticker.meta.category !== filter) return;
     const card = document.createElement("button");
     card.className = "sticker-card";
     card.classList.toggle("is-on-fridge", sticker.placed);
@@ -204,6 +207,50 @@ function refreshCollection(force = false) {
     grid.appendChild(card);
   });
 }
+/** Older saves can carry damaged layouts (an earlier bug clamped every
+ *  sticker into a tight center column, and fixed landing spots stacked
+ *  stickers on one point). Heal them on load so nobody arrives at a clump:
+ *  a save with virtually everything piled on the front is re-seeded to the
+ *  catalog's spread; individual same-spot stacks are fanned out. Genuine
+ *  hand-made arrangements never trip either signature. */
+function healLayout() {
+  const placed = stickers.items.filter((s) => s.placed);
+  const frontHeavy =
+    placed.length >= 20 &&
+    placed.filter((s) => s.placement.surface === "front").length >= 18;
+  if (frontHeavy) {
+    for (const s of placed) {
+      if (s.meta.custom)
+        s.setPlacement(stickers.openSpot(s.width, s.height, s.angle), true);
+      else
+        s.setPlacement(
+          { surface: s.meta.surface || "front", u: s.meta.u, v: s.meta.v },
+          true,
+        );
+    }
+    saveSoon();
+    // Fall through: band stickers share one catalog spot, so a re-seeded
+    // save can still hold same-point stacks the pass below fans out.
+  }
+  const kept = [];
+  let healed = 0;
+  for (const s of placed) {
+    const stacked = kept.some(
+      (other) =>
+        other.placement.surface === s.placement.surface &&
+        Math.hypot(
+          other.placement.u - s.placement.u,
+          other.placement.v - s.placement.v,
+        ) < 0.12,
+    );
+    if (stacked) {
+      s.setPlacement(stickers.openSpot(s.width, s.height, s.angle), true);
+      healed += 1;
+    }
+    kept.push(s);
+  }
+  if (healed) saveSoon();
+}
 function openDialog(dialog) {
   interaction.cancel();
   interaction.stopDemo();
@@ -214,13 +261,169 @@ function openDialog(dialog) {
   dialog.showModal();
 }
 
+function flash(on) {
+  const overlay = $("#flash");
+  overlay.classList.toggle("fast", reducedMotion);
+  overlay.classList.toggle("visible", on);
+}
+function frontStickers() {
+  return stickers.items.filter(
+    (s) => s.placed && s.placement.surface === "front",
+  );
+}
+function buildField() {
+  const created = createFieldWorld({
+    renderer: app.renderer,
+    canvas: $("#world"),
+    audio,
+    reducedMotion,
+    environment: app.scene.environment,
+    onExit: exitField,
+  });
+  // Warm the field shaders during the door swing so the white-out swap can't hitch.
+  if (app.renderer.extensions.has("KHR_parallel_shader_compile"))
+    app.renderer.compileAsync(created.scene, created.camera).catch(() => {});
+  return created;
+}
+function enterField() {
+  if (mode !== "fridge") return;
+  drawer.close();
+  interaction.suspend(true);
+  app.stopMotion();
+  app.controls.enabled = false;
+  // Stickers on the door ride the swing; their `placement` is untouched, so the
+  // round trip back to the scene at angle 0 restores them exactly.
+  for (const s of frontStickers()) {
+    fridge.doorPivot.attach(s.group);
+    fridge.doorPivot.attach(s.shadow);
+  }
+  field ||= buildField();
+  // Prime the doorway view now: the field's sun shadow renders once and its
+  // shaders compile under the click, not mid-swing.
+  app.renderer.shadowMap.needsUpdate = true;
+  portal.renderView(field, app.camera);
+  audio.unlock();
+  audio.doorOpen();
+  mode = "opening";
+  transition = {
+    t: 0,
+    flashOn: false,
+    fromPosition: app.camera.position.clone(),
+  };
+}
+function exitField() {
+  if (mode === "field") {
+    mode = "returning";
+    field.deactivate();
+    transition = {
+      t: 0,
+      phase: "toWhite",
+      startAngle: OPEN_ANGLE,
+      doorSound: false,
+    };
+    flash(true);
+  } else if (mode === "opening") {
+    // Abort mid-swing: close from the current angle, no white-out needed.
+    mode = "returning";
+    flash(false);
+    transition = {
+      t: 0,
+      phase: "closing",
+      startAngle: fridge.doorAngle,
+      doorSound: false,
+    };
+  }
+}
+function updateOpening(dt) {
+  const tr = transition;
+  tr.t += dt;
+  const doorT = easeInOutCubic(clamp(tr.t / TIMES.door, 0, 1));
+  const doorMoved = fridge.setDoorAngle(OPEN_ANGLE * doorT);
+  portal.setAmount(clamp(tr.t / TIMES.door, 0, 1));
+  if (!reducedMotion && tr.t > 0.25) {
+    const k = easeInOutCubic(clamp((tr.t - 0.25) / 1.3, 0, 1));
+    app.camera.position.lerpVectors(tr.fromPosition, DOLLY_TO, k);
+    app.camera.lookAt(DOLLY_LOOK);
+  }
+  // Live view through the doorway first (it consumes its own shadow pass),
+  // then the swinging door's shadow update, then the room itself.
+  portal.renderView(field, app.camera);
+  if (doorMoved) app.renderer.shadowMap.needsUpdate = true;
+  if (!tr.flashOn && tr.t >= TIMES.flashAt) {
+    tr.flashOn = true;
+    flash(true);
+  }
+  if (tr.t >= TIMES.swapAt) {
+    // The doorway fills the frame and the field camera takes over from the
+    // exact pose the portal was rendered with — no cut to hide.
+    field.activate({ from: portal.viewCamera });
+    document.body.classList.add("in-field");
+    mode = "field";
+    transition = null;
+    if (tr.flashOn) flash(false);
+    toast("Scroll to walk · drag to look · Esc returns");
+    app.renderer.shadowMap.needsUpdate = true;
+    field.update(dt);
+    field.render();
+    return;
+  }
+  app.renderer.render(app.scene, app.camera);
+}
+function updateReturning(dt) {
+  const tr = transition;
+  tr.t += dt;
+  if (tr.phase === "toWhite") {
+    field.update(dt);
+    if (tr.t < TIMES.whiteIn) {
+      field.render();
+      return;
+    }
+    tr.phase = "closing";
+    tr.t = 0;
+    app.reset(true);
+    flash(false);
+    document.body.classList.remove("in-field");
+  }
+  const k = easeInOutCubic(clamp(tr.t / TIMES.close, 0, 1));
+  const angle = tr.startAngle * (1 - k);
+  const doorMoved = fridge.setDoorAngle(angle);
+  portal.setAmount(angle / OPEN_ANGLE);
+  // The field stays visible through the shrinking gap until the door seals.
+  if (angle > 0.001) portal.renderView(field, app.camera);
+  if (doorMoved) app.renderer.shadowMap.needsUpdate = true;
+  if (!tr.doorSound && angle < 0.35) {
+    tr.doorSound = true;
+    audio.doorClose();
+  }
+  app.update(dt);
+  app.renderer.render(app.scene, app.camera);
+  if (k >= 1) {
+    fridge.setDoorAngle(0);
+    portal.setAmount(0);
+    for (const s of frontStickers()) {
+      app.scene.attach(s.group);
+      app.scene.attach(s.shadow);
+    }
+    interaction.suspend(false);
+    app.controls.enabled = true;
+    app.renderer.shadowMap.needsUpdate = true;
+    mode = "fridge";
+    transition = null;
+  }
+}
+
 function bindUI() {
   $("#home").onclick = () => {
+    if (mode === "field" || mode === "opening") {
+      audio.unlock();
+      exitField();
+      return;
+    }
+    if (mode === "returning") return;
     drawer.close();
     interaction.cancel();
     interaction.select(null);
     interaction.setHover(null);
-    brandPeel.slam();
     audio.unlock();
     audio.stick();
     app.reset(reducedMotion);
@@ -251,7 +454,7 @@ function bindUI() {
   );
   $$("dialog").forEach((dialog) => {
     dialog.addEventListener("close", () => {
-      app.controls.enabled = !interaction.busy;
+      app.controls.enabled = mode === "fridge" && !interaction.busy;
     });
     dialog.addEventListener("click", (event) => {
       if (event.target !== dialog) return;
@@ -265,17 +468,6 @@ function bindUI() {
         dialog.close();
     });
   });
-  $$(".collection-filters button").forEach(
-    (button) =>
-      (button.onclick = () => {
-        filter = button.dataset.filter;
-        $$(".collection-filters button").forEach((b) => {
-          b.classList.toggle("active", b === button);
-          b.setAttribute("aria-pressed", String(b === button));
-        });
-        refreshCollection();
-      }),
-  );
   $("#upload-sticker").onclick = () => $("#sticker-file").click();
   $("#sticker-file").onchange = async (event) => {
     const file = event.target.files[0];
@@ -302,16 +494,9 @@ function bindUI() {
         image,
         file.name.replace(/\.[^.]+$/, "").replace(/[_-]/g, " "),
       );
-      filter = "all";
-      $$(".collection-filters button").forEach((b) => {
-        b.classList.toggle("active", b.dataset.filter === "all");
-        b.setAttribute("aria-pressed", String(b.dataset.filter === "all"));
-      });
       refreshCollection(true);
-      drawer.close();
-      interaction.select(sticker);
       audio.unlock();
-      audio.stick();
+      printSticker(sticker);
       saveSoon();
     } catch (error) {
       toast(
@@ -339,14 +524,71 @@ function bindUI() {
     interaction.select(null);
     interaction.cancel();
     stickers.reset();
-    filter = "all";
-    $$(".collection-filters button").forEach((b) => {
-      b.classList.toggle("active", b.dataset.filter === "all");
-      b.setAttribute("aria-pressed", String(b.dataset.filter === "all"));
-    });
     refreshCollection(true);
     resetLabel();
   };
+}
+
+/** The upload button is a printer: the new sticker feeds out of the slot,
+ *  then flies down into its (alphabetized) tray cell, which the tray scrolls
+ *  to meet. Reduced motion skips straight to the scroll and glow. */
+function printSticker(sticker) {
+  const station = $("#print-station");
+  const card = $("#sticker-grid").querySelector(
+    `[data-sticker="${sticker.id}"]`,
+  );
+  if (reducedMotion || !card || !station) {
+    station?.classList.remove("is-printing");
+    if (card) {
+      card.scrollIntoView({ behavior: "auto", block: "center" });
+      card.classList.add("just-printed");
+    }
+    audio.stick();
+    return;
+  }
+  const image = station.querySelector(".print-out img");
+  image.src = sticker.art.thumbnail;
+  station.classList.add("is-printing");
+  audio.printer();
+  setTimeout(() => {
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      const from = station.querySelector(".print-out").getBoundingClientRect();
+      const to = card.getBoundingClientRect();
+      const flight = image.cloneNode();
+      Object.assign(flight.style, {
+        position: "fixed",
+        left: `${from.left}px`,
+        top: `${from.top}px`,
+        width: `${from.width}px`,
+        height: `${from.height}px`,
+        zIndex: 40,
+        pointerEvents: "none",
+        objectFit: "contain",
+        transition:
+          "transform 0.55s cubic-bezier(0.3, 0.8, 0.3, 1), opacity 0.55s",
+        filter: "drop-shadow(0 8px 10px rgba(0,0,0,0.5))",
+      });
+      document.body.appendChild(flight);
+      station.classList.remove("is-printing");
+      const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+      const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          flight.style.transform = `translate(${dx}px, ${dy}px) scale(${Math.min(
+            1,
+            (to.width * 0.72) / from.width,
+          )})`;
+          flight.style.opacity = "0.2";
+        }),
+      );
+      setTimeout(() => {
+        flight.remove();
+        card.classList.add("just-printed");
+        audio.stick();
+      }, 590);
+    }, 560);
+  }, 1200);
 }
 
 function takeSnapshot() {
@@ -362,8 +604,8 @@ function takeSnapshot() {
       pad = source.width * 0.06;
     // Match the viewer exactly: a pure black canvas, no tinted vignette.
     ctx.fillStyle = "#f0f0f0";
-    ctx.font = `500 ${28 * ratio}px "DM Sans"`;
-    ctx.fillText("Mid90s Minifridge", pad, 60 * ratio);
+    ctx.font = `500 ${14 * ratio}px "DM Sans"`;
+    ctx.fillText("AventXP", pad, 60 * ratio);
     ctx.font = `${11 * ratio}px "DM Sans"`;
     ctx.fillStyle = "#99999e";
     ctx.fillText("Your sticker collection", pad, source.height - 38 * ratio);
@@ -399,6 +641,9 @@ async function init() {
       '400 16px "DM Sans"',
       '500 24px "DM Sans"',
       '700 24px "DM Sans"',
+      // The vending machine's canvas art is painted lazily on first door-open.
+      '24px "Sticker Heavy"',
+      '24px "Sticker Marker"',
     ].map((f) => document.fonts.load(f)),
   ).catch(() => {});
   const [maps] = await Promise.all([makeEnamelTextures(), fonts]);
@@ -413,14 +658,46 @@ async function init() {
   const previous = storedState();
   if (previous && [1, 2, 3].includes(previous.version)) {
     await stickers.restore(previous.stickers);
-    setFinish(previous.finish || "cream");
     audio.enabled = previous.sound !== false;
+    healLayout();
   }
-  interaction = new Interaction(app, fridge, stickers, audio);
+  setFinish(previous?.finish || "cream");
+  portal = createPortal(app.renderer);
+  app.scene.add(portal.group);
+  // The bin rises whenever a drag leaves the fridge; dropping there sends the
+  // sticker back to the tray. Manual hit-testing keeps the zone from ever
+  // intercepting pointer events itself.
+  const overTrash = (event) => {
+    const zone = $("#trash-zone");
+    if (!zone || !event) return false;
+    const r = zone.getBoundingClientRect(),
+      slop = 16;
+    return (
+      event.clientX >= r.left - slop &&
+      event.clientX <= r.right + slop &&
+      event.clientY >= r.top - slop &&
+      event.clientY <= r.bottom + slop
+    );
+  };
+  interaction = new Interaction(app, fridge, stickers, audio, {
+    handleClick: () => enterField(),
+    drag: (dragging, sticker, valid, event) => {
+      const zone = $("#trash-zone");
+      if (!zone) return;
+      const show = !!dragging && !valid;
+      zone.classList.toggle("visible", show);
+      zone.classList.toggle("hot", show && overTrash(event));
+    },
+    trash: (event) => {
+      if (!overTrash(event)) return false;
+      audio.trash();
+      toast("Back in the tray.");
+      return true;
+    },
+  });
   drawer = new CollectionDrawer($("#collection-dialog"), interaction, {
     reducedMotion,
   });
-  brandPeel = new BrandPeel($("#home"), reducedMotion);
   stickers.onChange = () => {
     app.renderer.shadowMap.needsUpdate = true;
     saveSoon();
@@ -447,21 +724,33 @@ async function init() {
   app.renderer.render(app.scene, app.camera);
   report(100);
   setTimeout(
-    () => $("#loader").classList.add("ready"),
+    () => {
+      $("#loader").classList.add("ready");
+      if (!reducedMotion) brandSmiley.play();
+    },
     Math.max(50, 650 - (performance.now() - start)),
   );
   let previousTime = performance.now();
+  function step(dt) {
+    if (mode === "fridge") {
+      interaction.update();
+      app.update(dt);
+      if (stickers.update(dt, reducedMotion))
+        app.renderer.shadowMap.needsUpdate = true;
+      app.renderer.render(app.scene, app.camera);
+    } else if (mode === "field") {
+      field.update(dt);
+      field.render();
+    } else if (mode === "opening") updateOpening(dt);
+    else if (mode === "returning") updateReturning(dt);
+  }
   function animate(now) {
     if (disposed) return;
     frameId = requestAnimationFrame(animate);
     const dt = clamp((now - previousTime) / 1000, 0.001, 0.033);
     previousTime = now;
     if (document.hidden || renderingPaused) return;
-    interaction.update();
-    app.update(dt);
-    if (stickers.update(dt, reducedMotion))
-      app.renderer.shadowMap.needsUpdate = true;
-    app.renderer.render(app.scene, app.camera);
+    step(dt);
   }
   frameId = requestAnimationFrame(animate);
   $("#world").addEventListener("webglcontextlost", (event) => {
@@ -473,6 +762,8 @@ async function init() {
     if (document.hidden) {
       interaction.cancel();
       saveSoon.flush();
+      // The render loop idles while hidden; the WebAudio loops must not drone on.
+      field?.muteAmbience();
     }
   });
   window.addEventListener("pagehide", (event) => {
@@ -486,12 +777,21 @@ async function init() {
     stickers,
     interaction,
     collection: drawer,
-    brandPeel,
     takeSnapshot,
     reset: () => stickers.reset(),
     save,
     pause: (value = true) => {
       renderingPaused = value;
+    },
+    enterField,
+    exitField,
+    // Deterministic frame advance for QA scripts that pause the render loop.
+    step,
+    get mode() {
+      return mode;
+    },
+    get field() {
+      return field;
     },
     version: THREE.REVISION,
   };
@@ -502,10 +802,11 @@ function dispose() {
   disposed = true;
   cancelAnimationFrame(frameId);
   drawer?.dispose();
-  brandPeel?.dispose();
   interaction?.dispose();
   stickers?.dispose();
   lighting?.dispose();
+  field?.dispose();
+  portal?.dispose();
   audio.dispose();
   const geometries = new Set(),
     materials = new Set(),

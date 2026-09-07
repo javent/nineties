@@ -26,7 +26,7 @@ face = hb.Face(data)
 hfont = hb.Font(face)
 hfont.scale = (face.upem, face.upem)
 buffer = hb.Buffer()
-buffer.add_str('Mid90s Minifridge')
+buffer.add_str('AventXP')
 buffer.guess_segment_properties()
 hb.shape(hfont, buffer, {'kern': True, 'liga': True})
 glyphs = font.getGlyphSet()
@@ -45,7 +45,7 @@ x0, y0, x1, y1 = bounds.bounds
 pad = 12
 width, height = x1 - x0 + 2 * pad, y1 - y0 + 2 * pad
 svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width:g} {height:g}" fill="currentColor">
-  <title>Mid90s Minifridge</title>
+  <title>AventXP</title>
   <desc>Wordmark rendered from Revue Regular using the user-specified Font.Download source. This is an outlined image, not a bundled font. See the font usage notes before public or commercial use.</desc>
   <g transform="translate({-x0+pad:g} {y1+pad:g}) scale(1 -1)">
     <path d="{paths.getCommands()}"/>

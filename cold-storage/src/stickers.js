@@ -283,6 +283,43 @@ export class StickerManager {
   find(id) {
     return this.items.find((s) => s.id === id);
   }
+  /** A landing spot on the front that keeps arrivals spread out: sample a
+   *  coarse grid and take the cell farthest from every placed sticker, so
+   *  successive drops fan across the door instead of stacking on one point. */
+  openSpot(width, height, angle = 0) {
+    const front = this.fridge.surfaces.front;
+    const cols = 5,
+      rows = 8;
+    let best = { surface: "front", u: 0.2, v: 0.35 },
+      bestScore = -Infinity;
+    for (let row = 0; row < rows; row++)
+      for (let col = 0; col < cols; col++) {
+        const candidate = this.fridge.fitPlacement(
+          {
+            surface: "front",
+            u: (col / (cols - 1) - 0.5) * front.width,
+            v: (row / (rows - 1) - 0.5) * front.height,
+          },
+          width,
+          height,
+          angle,
+        );
+        let nearest = Infinity;
+        for (const other of this.items) {
+          if (!other.placed || other.placement.surface !== "front") continue;
+          const d = Math.hypot(
+            candidate.u - other.placement.u,
+            candidate.v - other.placement.v,
+          );
+          if (d < nearest) nearest = d;
+        }
+        if (nearest > bestScore) {
+          bestScore = nearest;
+          best = candidate;
+        }
+      }
+    return best;
+  }
   bringToFront(sticker) {
     this.items = this.items.filter((s) => s !== sticker);
     this.items.push(sticker);
@@ -316,6 +353,8 @@ export class StickerManager {
       height = aspect >= 1 ? Math.max(0.24, 1.06 / aspect) : 1.06;
     const id =
       options.id || `custom-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    // Fresh prints land wherever the door has the most room.
+    const spot = this.openSpot(width, height, THREE.MathUtils.degToRad(-5));
     const sticker = this.add(
       {
         id,
@@ -323,8 +362,8 @@ export class StickerManager {
         category: "custom",
         width,
         height,
-        u: 0.32,
-        v: 0.3,
+        u: spot.u,
+        v: spot.v,
         angle: -5,
         custom: true,
       },
