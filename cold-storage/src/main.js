@@ -207,6 +207,50 @@ function refreshCollection(force = false) {
     grid.appendChild(card);
   });
 }
+/** Older saves can carry damaged layouts (an earlier bug clamped every
+ *  sticker into a tight center column, and fixed landing spots stacked
+ *  stickers on one point). Heal them on load so nobody arrives at a clump:
+ *  a save with virtually everything piled on the front is re-seeded to the
+ *  catalog's spread; individual same-spot stacks are fanned out. Genuine
+ *  hand-made arrangements never trip either signature. */
+function healLayout() {
+  const placed = stickers.items.filter((s) => s.placed);
+  const frontHeavy =
+    placed.length >= 20 &&
+    placed.filter((s) => s.placement.surface === "front").length >= 18;
+  if (frontHeavy) {
+    for (const s of placed) {
+      if (s.meta.custom)
+        s.setPlacement(stickers.openSpot(s.width, s.height, s.angle), true);
+      else
+        s.setPlacement(
+          { surface: s.meta.surface || "front", u: s.meta.u, v: s.meta.v },
+          true,
+        );
+    }
+    saveSoon();
+    // Fall through: band stickers share one catalog spot, so a re-seeded
+    // save can still hold same-point stacks the pass below fans out.
+  }
+  const kept = [];
+  let healed = 0;
+  for (const s of placed) {
+    const stacked = kept.some(
+      (other) =>
+        other.placement.surface === s.placement.surface &&
+        Math.hypot(
+          other.placement.u - s.placement.u,
+          other.placement.v - s.placement.v,
+        ) < 0.12,
+    );
+    if (stacked) {
+      s.setPlacement(stickers.openSpot(s.width, s.height, s.angle), true);
+      healed += 1;
+    }
+    kept.push(s);
+  }
+  if (healed) saveSoon();
+}
 function openDialog(dialog) {
   interaction.cancel();
   interaction.stopDemo();
@@ -615,6 +659,7 @@ async function init() {
   if (previous && [1, 2, 3].includes(previous.version)) {
     await stickers.restore(previous.stickers);
     audio.enabled = previous.sound !== false;
+    healLayout();
   }
   setFinish(previous?.finish || "cream");
   portal = createPortal(app.renderer);

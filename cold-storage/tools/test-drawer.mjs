@@ -303,6 +303,57 @@ assert.equal(
   1,
 );
 console.log("Inventory placement persistence ✓");
+// A damaged save — everything clamped into one tight center clump — must
+// heal on the next landing into a spread across the fridge's surfaces.
+await page.evaluate(() => {
+  let k = 0;
+  for (const s of mid90sMinifridge.stickers.items)
+    if (s.placed) {
+      s.setPlacement(
+        {
+          surface: "front",
+          u: -0.2 + (k % 3) * 0.2,
+          v: 1.1 - Math.floor(k / 3) * 0.35,
+        },
+        true,
+      );
+      k += 1;
+    }
+  mid90sMinifridge.save();
+});
+await page.reload();
+await page.waitForFunction(() => window.mid90sMinifridge, { timeout: 120000 });
+await page.waitForFunction(
+  () =>
+    getComputedStyle(document.querySelector("#loader")).visibility === "hidden",
+);
+await page.evaluate(() => mid90sMinifridge.pause());
+const healed = await page.evaluate(() => {
+  const placed = mid90sMinifridge.stickers.items.filter((s) => s.placed);
+  const front = placed.filter((s) => s.placement.surface === "front");
+  const us = front.map((s) => s.placement.u),
+    vs = front.map((s) => s.placement.v);
+  return {
+    placed: placed.length,
+    front: front.length,
+    surfaces: new Set(placed.map((s) => s.placement.surface)).size,
+    spreadU: Math.max(...us) - Math.min(...us),
+    spreadV: Math.max(...vs) - Math.min(...vs),
+  };
+});
+assert.ok(
+  healed.surfaces >= 3,
+  `expected multi-surface heal, got ${healed.surfaces}`,
+);
+assert.ok(
+  healed.front <= healed.placed - 8,
+  `front still heavy: ${healed.front}/${healed.placed}`,
+);
+assert.ok(
+  healed.spreadU > 1.6 && healed.spreadV > 3.2,
+  `front not spread: ${healed.spreadU.toFixed(2)} × ${healed.spreadV.toFixed(2)}`,
+);
+console.log("Damaged-save healing ✓");
 await context.close();
 const mobile = await open({ width: 390, height: 844 }, true);
 await shot(mobile.cdp, "mobile");
