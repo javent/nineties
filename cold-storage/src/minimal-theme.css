@@ -50,6 +50,56 @@ button:hover {
   border-bottom: 0;
   gap: 24px;
 }
+/* Hovering the home smiley fades in a circular sticker backing; the disc and
+ * face tilt up a touch together, like a sticker corner starting to peel. */
+#home {
+  perspective: 220px;
+}
+.brand-smiley {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  transform-origin: 22% 78%;
+  transition: transform 0.28s cubic-bezier(0.33, 1.4, 0.5, 1);
+}
+.brand-smiley::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  background: #f2f2f4;
+  opacity: 0;
+  transition:
+    opacity 0.22s ease,
+    box-shadow 0.28s ease;
+}
+.brand-smiley svg {
+  position: relative;
+  transition: filter 0.22s ease;
+}
+#home:hover .brand-smiley,
+#home:focus-visible .brand-smiley {
+  transform: rotateX(14deg) rotateY(-12deg) rotate(-4deg);
+}
+#home:hover .brand-smiley::before,
+#home:focus-visible .brand-smiley::before {
+  opacity: 1;
+  box-shadow:
+    3px 7px 13px #000a,
+    0 2px 4px #0007;
+}
+#home:hover .brand-smiley svg,
+#home:focus-visible .brand-smiley svg {
+  filter: invert(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-smiley,
+  .brand-smiley::before,
+  .brand-smiley svg {
+    transition: none;
+  }
+}
 .brand {
   font: 600 25px/1.2 var(--sans);
   letter-spacing: -0.8px;
@@ -570,26 +620,112 @@ dialog::backdrop {
   }
 }
 
-/* A vector rendering of "Mid90s Minifridge" in the requested font, scoped to #home.
- * Other text—including dialogs and snapshot labels—stays in DM Sans. */
-#home .brand-wordmark {
+/* ————— Through the fridge: door portal, Bliss field, SURGE machine ————— */
+
+/* The chrome handle (and, up close, the machine's buttons) invite a click. */
+#world.is-handle-hover {
+  cursor: pointer;
+}
+
+/* White-out that covers the scene swap between the fridge room and the field. */
+#flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+  z-index: 30;
+}
+#flash.visible {
+  opacity: 1;
+}
+#flash.fast {
+  transition-duration: 0.22s;
+}
+
+/* Field mode strips the fridge chrome down to the wordmark, sound and about.
+ * The wordmark stays because it is the way home. */
+.gesture-guide .field-only {
+  display: none;
+}
+body.in-field .finish-picker,
+body.in-field .collection-trigger,
+body.in-field .gesture-guide > :not(.field-only) {
+  display: none;
+}
+body.in-field .gesture-guide .field-only {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+body.in-field .gesture-guide i.field-only {
+  display: inline-block;
+}
+
+/* Nickelodeon slime: a green wall on detonation, then persistent drips along
+ * the top edge. Pure CSS gradients — no images, no per-frame JS. Scoped to
+ * field mode so the fridge room never shows residue. */
+#slime {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 26;
+  display: none;
+  opacity: 0;
+}
+body.in-field #slime {
   display: block;
-  width: 312px;
-  height: auto;
-  fill: currentColor;
 }
-@media (max-width: 800px) {
-  #home .brand-wordmark {
-    width: 270px;
+#slime.burst {
+  opacity: 1;
+  background: radial-gradient(
+    circle at 50% 55%,
+    #7fe22c 0%,
+    #58c716 55%,
+    rgba(88, 199, 22, 0.94) 100%
+  );
+  animation: slime-burst 0.9s ease-out forwards;
+}
+#slime.slimed {
+  opacity: 1;
+  background:
+    radial-gradient(90px 190px at 8% -60px, #58c716 62%, transparent 63%),
+    radial-gradient(140px 300px at 26% -120px, #63d51c 62%, transparent 63%),
+    radial-gradient(110px 210px at 47% -80px, #4fbb12 62%, transparent 63%),
+    radial-gradient(150px 340px at 68% -150px, #63d51c 62%, transparent 63%),
+    radial-gradient(100px 170px at 88% -50px, #58c716 62%, transparent 63%),
+    linear-gradient(#58c716, #58c716) top / 100% 26px no-repeat;
+}
+@keyframes slime-burst {
+  0% {
+    clip-path: circle(4% at 50% 55%);
+    opacity: 1;
+  }
+  45% {
+    clip-path: circle(120% at 50% 55%);
+    opacity: 1;
+  }
+  100% {
+    clip-path: circle(120% at 50% 55%);
+    opacity: 0;
   }
 }
-@media (max-width: 560px) {
-  #home .brand-wordmark {
-    width: 230px;
+@media (prefers-reduced-motion: reduce) {
+  #slime.burst {
+    animation: none;
+    opacity: 0;
   }
 }
-@media (max-width: 380px) {
-  #home .brand-wordmark {
-    width: 186px;
-  }
+
+/* The chrome bars are painted over the 3D canvas; only their actual controls
+ * should eat clicks. Otherwise a can resting low in the field (or any scene
+ * element near the screen edges) becomes silently unclickable. */
+.topbar,
+.bottom-bar {
+  pointer-events: none;
+}
+.topbar button,
+.bottom-bar .sound-toggle {
+  pointer-events: auto;
 }

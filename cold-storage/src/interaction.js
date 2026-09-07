@@ -12,13 +12,21 @@ export class Interaction {
     this.hovered = null;
     this.selected = null;
     this.demoUntil = 0;
+    // While the door transition or the field world owns the canvas, sticker and
+    // camera gestures must go quiet without tearing the listeners down.
+    this.suspended = false;
+    this.handleHover = false;
+    this.handleGlow = 0;
     this.handlers = {
       pointerdown: (e) => this.down(e),
       pointermove: (e) => this.move(e),
       pointerup: (e) => this.up(e),
       pointercancel: (e) => this.cancel(e),
       pointerleave: () => {
-        if (!this.active) this.setHover(null);
+        if (!this.active) {
+          this.setHover(null);
+          this.setHandleHover(false);
+        }
       },
       lostpointercapture: (e) => {
         if (this.active?.pointerId === e.pointerId) this.cancel(e);
@@ -132,7 +140,9 @@ export class Interaction {
     this.stopDemo();
     if (!sticker.placed) {
       sticker.setPlaced(true);
-      sticker.setPlacement({ surface: "front", u: 0.2, v: 0.35 });
+      sticker.setPlacement(
+        this.stickers.openSpot(sticker.width, sticker.height, sticker.angle),
+      );
       sticker.peel = 0.4;
       sticker.settle = 0.33;
       this.stickers.bringToFront(sticker);
@@ -162,6 +172,24 @@ export class Interaction {
     this.canvas.classList.toggle("is-hovering", !!sticker);
     this.callbacks.hover?.(sticker, event);
   }
+  setHandleHover(value) {
+    value = !!value;
+    if (this.handleHover === value) return;
+    this.handleHover = value;
+    this.canvas.classList.toggle("is-handle-hover", value);
+  }
+  pickHandle() {
+    return this.raycaster.intersectObjects(this.fridge.handleMeshes, false)[0];
+  }
+  suspend(value) {
+    this.suspended = value;
+    if (!value) return;
+    this.cancel();
+    this.setHover(null);
+    this.setHandleHover(false);
+    this.handleGlow = 0;
+    this.fridge.setHandleGlow(0);
+  }
   select(sticker) {
     if (this.selected) this.selected.selected = false;
     this.selected = sticker;
@@ -175,6 +203,7 @@ export class Interaction {
     this.callbacks.select?.(sticker);
   }
   down(event) {
+    if (this.suspended) return;
     if (event.button !== 0 || document.querySelector("dialog[open]")) return;
     if (this.active?.armed) {
       event.preventDefault();
@@ -196,6 +225,15 @@ export class Interaction {
     if (!hit) {
       this.select(null);
       this.setHover(null);
+      // Stickers win over the handle, so a sticker slid near the hardware stays
+      // draggable; empty enamel behind the handle still opens the door.
+      if (this.pickHandle()) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        this.setHandleHover(false);
+        this.audio.unlock();
+        this.callbacks.handleClick?.();
+      }
       return;
     }
     event.preventDefault();
@@ -255,6 +293,7 @@ export class Interaction {
     this.callbacks.drag?.(true, active.sticker, true);
   }
   move(event) {
+    if (this.suspended) return;
     if (this.active) {
       if (this.active.armed) return; // Window-level movement also works over UI controls.
       if (event.pointerId !== this.active.pointerId) return;
@@ -279,10 +318,13 @@ export class Interaction {
       document.querySelector("dialog[open]")
     ) {
       this.setHover(null);
+      this.setHandleHover(false);
       return;
     }
     this.setRay(event);
-    this.setHover(this.pickSticker()?.object.userData.sticker || null, event);
+    const sticker = this.pickSticker()?.object.userData.sticker || null;
+    this.setHover(sticker, event);
+    this.setHandleHover(!sticker && !!this.pickHandle());
   }
   moveActive(event) {
     const a = this.active,
@@ -347,6 +389,7 @@ export class Interaction {
     this.callbacks.drag?.(true, s, a.valid);
   }
   up(event) {
+    if (this.suspended) return;
     const a = this.active;
     if (!a || a.pointerId !== event.pointerId) return;
     event.preventDefault();
@@ -395,6 +438,7 @@ export class Interaction {
     this.finishActive();
   }
   key(event) {
+    if (this.suspended) return;
     if (
       document.querySelector("dialog[open]") ||
       event.ctrlKey ||
@@ -486,6 +530,13 @@ export class Interaction {
     if (this.demoUntil && performance.now() > this.demoUntil) {
       this.stopDemo();
       this.audio.stick();
+    }
+    const glowTarget = this.handleHover && !this.active ? 1 : 0;
+    if (Math.abs(this.handleGlow - glowTarget) > 0.001) {
+      this.handleGlow += (glowTarget - this.handleGlow) * 0.16;
+      if (Math.abs(this.handleGlow - glowTarget) <= 0.001)
+        this.handleGlow = glowTarget;
+      this.fridge.setHandleGlow(this.handleGlow);
     }
   }
   dispose() {

@@ -9,6 +9,7 @@
     "standalone": "node tools/standalone.mjs"
   },
   "dependencies": {
+    "lottie-web": "^5.13.0",
     "three": "0.185.1"
   },
   "devDependencies": {

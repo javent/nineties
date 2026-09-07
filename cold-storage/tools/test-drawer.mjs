@@ -41,6 +41,11 @@ async function open(viewport = { width: 1440, height: 900 }, touch = false) {
       getComputedStyle(document.querySelector("#loader")).visibility ===
       "hidden",
   );
+  // The drawer slides the canvas aside with a 0.24 s transform; QA clicks are
+  // computed from one rect snapshot, so freeze the slide to keep them exact.
+  await page.addStyleTag({
+    content: "#world, .vignette { transition: none !important; }",
+  });
   await page.evaluate(() => mid90sMinifridge.pause());
   return { context, page, cdp: await context.newCDPSession(page) };
 }
@@ -67,13 +72,16 @@ async function shot(cdp, name) {
 async function surface(page, u, v) {
   return page.evaluate(
     ({ u, v }) => {
+      // Read the canvas rect, not innerWidth: the open drawer translates the
+      // canvas on wide screens, and clicks must land where pixels really are.
       const a = mid90sMinifridge,
+        rect = document.querySelector("#world").getBoundingClientRect(),
         p = a.fridge
           .point({ surface: "front", u, v }, 0.025)
           .project(a.app.camera);
       return {
-        x: (p.x * 0.5 + 0.5) * innerWidth,
-        y: (-0.5 * p.y + 0.5) * innerHeight,
+        x: rect.left + (p.x * 0.5 + 0.5) * rect.width,
+        y: rect.top + (-0.5 * p.y + 0.5) * rect.height,
       };
     },
     { u, v },
@@ -82,7 +90,6 @@ async function surface(page, u, v) {
 async function card(page, id) {
   await page.locator("#open-collection").click();
   await page.waitForTimeout(280);
-  await page.locator('[data-filter="bands"]').click();
   const e = page.locator(`[data-sticker="${id}"]`);
   await e.scrollIntoViewIfNeeded();
   const r = await e.locator("img").boundingBox();
@@ -118,27 +125,26 @@ assert.equal(
 );
 await page.locator('.swatch[data-finish="cream"]').click();
 await page.waitForTimeout(500);
+// The header brand is the smiley button now (the peel wordmark was retired);
+// clicking it must still simply reset the view without errors.
 await page.locator("#home").hover();
-await page.waitForFunction(() => mid90sMinifridge.brandPeel.state.peel > 0.9);
-console.log(
-  "HOVER",
-  await page.evaluate(() => mid90sMinifridge.brandPeel.state),
-);
-assert.ok(
-  await page.evaluate(() => mid90sMinifridge.brandPeel.state.peel > 0.7),
-);
-await shot(cdp, "wordmark-peel");
 await page.locator("#home").click();
 await page.waitForTimeout(350);
-assert.ok(
-  await page.evaluate(() => mid90sMinifridge.brandPeel.state.peel < 0.01),
-);
+assert.equal(await page.evaluate(() => mid90sMinifridge.mode), "fridge");
 await tick(page);
 await page.mouse.move(12, 100);
 await page.locator("#open-collection").click();
 await page.waitForTimeout(280);
 assert.equal(await page.locator(".sticker-card").count(), 39);
-await shot(cdp, "wood-drawer");
+const names = await page.$$eval(
+  "#sticker-grid .sticker-card-label > span:first-child",
+  (els) => els.map((e) => e.textContent),
+);
+const sorted = [...names].sort((a, b) =>
+  a.localeCompare(b, undefined, { sensitivity: "base" }),
+);
+assert.deepEqual(names, sorted, "tray must be alphabetized");
+await shot(cdp, "caboodle-case");
 await page.getByRole("button", { name: "Close collection" }).click();
 await page.waitForTimeout(230);
 let p = await card(page, "band-weezer");
@@ -207,6 +213,8 @@ assert.equal(
   await page.evaluate(() => mid90sMinifridge.interaction.active?.armed),
   true,
 );
+// Let the canvas finish sliding back after the drawer closes (0.24 s CSS).
+await page.waitForTimeout(320);
 dest = await surface(page, 0.3, -0.75);
 await page.mouse.click(dest.x, dest.y);
 await tick(page);
@@ -221,6 +229,46 @@ assert.equal(
   39,
 );
 console.log("Click-to-place ✓");
+// The upload button is a printer: feed a file in, the sticker prints out and
+// files itself into the alphabetized tray while the drawer stays open.
+await page.locator("#open-collection").click();
+await page.waitForTimeout(280);
+await page.setInputFiles("#sticker-file", {
+  name: "aaa-test-print.png",
+  mimeType: "image/png",
+  buffer: Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+    "base64",
+  ),
+});
+await page.waitForFunction(
+  () => document.querySelectorAll("#sticker-grid .sticker-card").length === 40,
+  { timeout: 15000 },
+);
+assert.equal(
+  await page
+    .locator("#print-station")
+    .evaluate((e) => e.classList.contains("is-printing")),
+  true,
+);
+await page.waitForTimeout(2700); // wall-clock print feed + flight
+assert.equal(
+  await page
+    .locator("#print-station")
+    .evaluate((e) => e.classList.contains("is-printing")),
+  false,
+);
+assert.equal(
+  await page.locator("#collection-dialog").evaluate((e) => e.open),
+  true,
+);
+assert.equal(
+  await page.$$eval("#sticker-grid .sticker-card", (els) => els.length),
+  40,
+);
+console.log("Printer upload ✓");
+await page.getByRole("button", { name: "Close collection" }).click();
+await page.waitForTimeout(230);
 await page.evaluate(() => mid90sMinifridge.save());
 await page.reload();
 await page.waitForFunction(() => window.mid90sMinifridge, { timeout: 120000 });
@@ -246,6 +294,13 @@ assert.equal(
     () => mid90sMinifridge.stickers.find("band-oasis").placed,
   ),
   false,
+);
+// The printed sticker survives the reload.
+assert.equal(
+  await page.evaluate(
+    () => mid90sMinifridge.stickers.items.filter((s) => s.meta.custom).length,
+  ),
+  1,
 );
 console.log("Inventory placement persistence ✓");
 await context.close();
