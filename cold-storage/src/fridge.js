@@ -125,7 +125,7 @@ export function createFridge(maps) {
   badgeGroup.name = "Centered Evercool manufacturer badge";
   badgeGroup.position.set(0, 2.38, 1.337);
   group.add(badgeGroup);
-  const [badge, b] = canvas2D(1024, 256);
+  const [badge, b] = canvas2D(1024, 256, true);
   b.textAlign = "center";
   b.textBaseline = "middle";
   b.font = 'italic 171px "Instrument Serif"';

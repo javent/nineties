@@ -3,6 +3,9 @@ import { CATALOG, makeStickerArt, makeStickerTextures } from "./sticker-art.js";
 import { canvas2D, clamp, textureFrom, loadImage } from "./utils.js";
 
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
+// Reused inside update() so the per-frame loop over placed stickers does not
+// allocate a Vector3 per sticker per frame. Only ever used synchronously.
+const SCRATCH_POSITION = new THREE.Vector3();
 // Retain the original allowance of 16 uploads as the built-in collection grows.
 export const MAX_CUSTOM_STICKERS = 16;
 export const MAX_STICKERS = CATALOG.length + MAX_CUSTOM_STICKERS;
@@ -210,9 +213,9 @@ export class Sticker {
       this.settle > 0
         ? Math.sin((0.33 - this.settle) * 28) * 0.027 * (this.settle / 0.33)
         : 0;
-    const targetPosition = this.targetPosition
-      .clone()
-      .addScaledVector(this.normal, this.lift + Math.max(0, bounce));
+    const targetPosition = SCRATCH_POSITION.copy(
+      this.targetPosition,
+    ).addScaledVector(this.normal, this.lift + Math.max(0, bounce));
     const ease = 1 - Math.exp(-dt * (this.dragging ? 26 : 20));
     this.shadowChanged ||=
       this.group.position.distanceToSquared(targetPosition) > 1e-8 ||

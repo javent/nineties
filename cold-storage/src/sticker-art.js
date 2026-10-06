@@ -37,63 +37,102 @@ export async function makeStickerArt(item) {
   }
 }
 
-/** Front alpha is reused for the silver back and the soft, die-cut contact shadow. */
+/** Longest edge of the downscaled working copy that feeds the pointer hit mask,
+ * the drawer thumbnail and the procedural silver grain. */
+const MASK_MAX = 256;
+/** Longest edge of the adhesive back map. Its alpha drives the peeled sticker's
+ * die-cut silhouette (via alphaTest), so it stays higher than the grain. */
+const BACK_MAX = 512;
+
+/** Front alpha is reused for the silver back and the soft, die-cut contact shadow.
+ *
+ * Performance: the per-pixel JavaScript here used to run at the artwork's full
+ * resolution for every catalog entry (~9.4 MP across 39 stickers, with three
+ * trig calls per pixel). The expensive grain is now generated once at MASK_MAX
+ * and magnified, while the silhouette is cut with a native composite from the
+ * full-resolution art, so edge quality is preserved.
+ */
 export function makeStickerTextures(frontCanvas, seed = 1) {
   const w = frontCanvas.width,
-    h = frontCanvas.height,
-    ctx = frontCanvas.getContext("2d", { willReadFrequently: true });
-  const pixels = ctx.getImageData(0, 0, w, h),
-    alpha = new Uint8Array(w * h);
+    h = frontCanvas.height;
+
+  // One small working copy, read back once, shared by every derived map.
+  const maskScale = Math.min(1, MASK_MAX / Math.max(w, h));
+  const mw = Math.max(1, Math.round(w * maskScale)),
+    mh = Math.max(1, Math.round(h * maskScale));
+  const [mask, m] = canvas2D(mw, mh, true);
+  m.drawImage(frontCanvas, 0, 0, mw, mh);
+  const pixels = m.getImageData(0, 0, mw, mh),
+    alpha = new Uint8Array(mw * mh);
   for (let i = 0; i < alpha.length; i++) alpha[i] = pixels.data[i * 4 + 3];
-  const [back, b] = canvas2D(w, h),
-    image = b.createImageData(w, h),
-    rand = random(seed + 9000);
-  for (let y = 0; y < h; y++)
-    for (let x = 0; x < w; x++) {
-      const i = (y * w + x) * 4,
+
+  // Silver grain + wrinkles, rendered small. Frequencies are divided by the
+  // scale so the pattern keeps its original spatial size once magnified.
+  const [grainCanvas, g] = canvas2D(mw, mh);
+  const image = g.createImageData(mw, mh),
+    rand = random(seed + 9000),
+    inverse = 1 / (maskScale || 1);
+  for (let y = 0; y < mh; y++)
+    for (let x = 0; x < mw; x++) {
+      const i = (y * mw + x) * 4,
+        fx = x * inverse,
+        fy = y * inverse,
         grain = (rand() - 0.5) * 27,
         wrinkle =
-          Math.sin(y * 0.092 + Math.sin(x * 0.03) * 0.6) * 7 +
-          Math.cos(x * 0.049 + y * 0.011) * 5;
+          Math.sin(fy * 0.092 + Math.sin(fx * 0.03) * 0.6) * 7 +
+          Math.cos(fx * 0.049 + fy * 0.011) * 5;
       const v = 179 + grain + wrinkle;
       image.data[i] = v;
       image.data[i + 1] = v + 2;
       image.data[i + 2] = v + 3;
-      image.data[i + 3] = alpha[y * w + x];
+      image.data[i + 3] = 255;
     }
-  b.putImageData(image, 0, 0);
-  b.save();
-  b.globalCompositeOperation = "source-atop";
+  g.putImageData(image, 0, 0);
   for (let i = 0; i < 24; i++) {
-    const y = rand() * h;
-    b.strokeStyle = i % 2 ? "rgba(255,255,255,.18)" : "rgba(30,35,38,.13)";
-    b.lineWidth = 0.5 + rand() * 2;
-    b.beginPath();
-    b.moveTo(0, y);
-    b.bezierCurveTo(w * 0.33, y - 9, w * 0.66, y + 8, w, y + 3);
-    b.stroke();
+    const y = rand() * mh;
+    g.strokeStyle = i % 2 ? "rgba(255,255,255,.18)" : "rgba(30,35,38,.13)";
+    g.lineWidth = Math.max(0.15, (0.5 + rand() * 2) * maskScale);
+    g.beginPath();
+    g.moveTo(0, y);
+    g.bezierCurveTo(
+      mw * 0.33,
+      y - 9 * maskScale,
+      mw * 0.66,
+      y + 8 * maskScale,
+      mw,
+      y + 3 * maskScale,
+    );
+    g.stroke();
   }
-  b.restore();
+
+  // Magnify the grain, then punch the die-cut outline from the full-resolution
+  // artwork so the peeled underside keeps a crisp edge.
+  const backScale = Math.min(1, BACK_MAX / Math.max(w, h));
+  const bw = Math.max(1, Math.round(w * backScale)),
+    bh = Math.max(1, Math.round(h * backScale));
+  const [back, b] = canvas2D(bw, bh);
+  b.drawImage(grainCanvas, 0, 0, bw, bh);
+  b.globalCompositeOperation = "destination-in";
+  b.drawImage(frontCanvas, 0, 0, bw, bh);
+  b.globalCompositeOperation = "source-over";
+
   const [shadow, s] = canvas2D(256, Math.max(64, Math.round((256 * h) / w)));
   s.filter = "blur(3px)";
-  s.drawImage(frontCanvas, 6, 6, shadow.width - 12, shadow.height - 12);
+  s.drawImage(mask, 6, 6, shadow.width - 12, shadow.height - 12);
   s.filter = "none";
   s.globalCompositeOperation = "source-in";
   s.fillStyle = "#202517";
   s.fillRect(0, 0, shadow.width, shadow.height);
-  const thumbScale = Math.min(1, 256 / Math.max(w, h));
-  const [thumbnail, thumb] = canvas2D(
-    Math.max(1, Math.round(w * thumbScale)),
-    Math.max(1, Math.round(h * thumbScale)),
-  );
-  thumb.drawImage(frontCanvas, 0, 0, thumbnail.width, thumbnail.height);
+
   return {
     front: frontCanvas,
     back,
     shadow,
     alpha,
-    alphaWidth: w,
-    alphaHeight: h,
-    thumbnail: thumbnail.toDataURL("image/png"),
+    alphaWidth: mw,
+    alphaHeight: mh,
+    // The mask is already the thumbnail size. WebP encodes far faster than PNG
+    // and browsers that lack WebP encoding transparently fall back to PNG.
+    thumbnail: mask.toDataURL("image/webp", 0.82),
   };
 }
