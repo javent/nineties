@@ -20,8 +20,8 @@ export async function makeEnamelTextures() {
       (name) => withTimeout(loadImage(asset(name))).catch(() => null),
     ),
   );
-  const [color, c] = canvas2D(1024),
-    [rough, r] = canvas2D(1024),
+  const [color, c] = canvas2D(1024, 1024, true),
+    [rough, r] = canvas2D(1024, 1024, true),
     [normal, n] = canvas2D(1024);
   const rand = random(86);
   c.fillStyle = "#faf9f4";

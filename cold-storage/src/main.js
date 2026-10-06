@@ -429,7 +429,12 @@ async function init() {
   bindUI();
   updateSound();
   refreshCollection();
-  await lighting.ready;
+  // The procedural studio environment is already applied, so the 1.6 MB HDRI
+  // is only a refinement. Resolving it in the background keeps it off the
+  // critical path to first interaction; the swap is applied when it lands.
+  lighting.ready.then(() => {
+    app.renderer.shadowMap.needsUpdate = true;
+  });
   report(91);
   app.scene.updateMatrixWorld(true);
   app.camera.updateMatrixWorld(true);

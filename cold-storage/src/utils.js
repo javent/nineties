@@ -18,11 +18,21 @@ export function random(seed = 1) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-export function canvas2D(width = 512, height = width) {
+/** `willReadFrequently` pins a canvas to a CPU-backed surface, which makes
+ * drawImage and GPU texture uploads markedly slower. Only opt in for the few
+ * canvases we actually call getImageData on; everything else stays
+ * hardware-accelerated. */
+export function canvas2D(width = 512, height = width, readFrequently = false) {
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
-  return [canvas, canvas.getContext("2d", { willReadFrequently: true })];
+  return [
+    canvas,
+    canvas.getContext(
+      "2d",
+      readFrequently ? { willReadFrequently: true } : undefined,
+    ),
+  ];
 }
 export function textureFrom(canvas, color = true) {
   const texture = new THREE.CanvasTexture(canvas);

@@ -50,6 +50,8 @@ export function createScene(canvas) {
   let defaultDistance = 14.2,
     mobile = false,
     resetTween = null;
+  const panBefore = new THREE.Vector3();
+  const panDelta = new THREE.Vector3();
   const defaultTarget = new THREE.Vector3(0, -0.1, 0.26);
   const defaultDirection = new THREE.Vector3(0.3, 0.075, 1).normalize();
   function reset(instant = false, normal = null) {
@@ -140,12 +142,13 @@ export function createScene(canvas) {
         resetTween = null;
       }
     }
-    // Bound panning so the object cannot be accidentally lost.
-    const before = controls.target.clone();
+    // Bound panning so the object cannot be accidentally lost. Reuses scratch
+    // vectors: this runs every frame, so clones here are pure GC churn.
+    panBefore.copy(controls.target);
     controls.target.x = clamp(controls.target.x, -2.5, 2.5);
     controls.target.y = clamp(controls.target.y, -1.7, 1.7);
     controls.target.z = clamp(controls.target.z, -1.5, 1.5);
-    camera.position.add(controls.target.clone().sub(before));
+    camera.position.add(panDelta.copy(controls.target).sub(panBefore));
     if (controls.enabled) controls.update();
   }
   function stopMotion() {
