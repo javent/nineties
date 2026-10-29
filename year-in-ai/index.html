@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Arena — Year in AI 2026</title>
+    <meta
+      name="description"
+      content="A scrolling fly-through of the AI milestones of 2026, measured on the Arena leaderboards."
+    />
+    <meta name="theme-color" content="#1a1819" />
+  </head>
+  <body>
+    <canvas id="stage"></canvas>
+
+    <!-- thin leader lines between slabs and their chips -->
+    <svg id="leaders" aria-hidden="true"></svg>
+
+    <!-- everything anchored to a point in the 3D scene -->
+    <div id="world-layer"></div>
+
+    <!-- opening titles -->
+    <section id="intro" aria-label="Introduction"></section>
+
+    <div class="scrim scrim-top"></div>
+    <div class="scrim scrim-bottom"></div>
+
+    <!-- heads-up display -->
+    <header id="hud-top"></header>
+    <aside id="radar"></aside>
+    <footer id="hud-bottom"></footer>
+
+    <div id="menu-sheet" hidden></div>
+
+    <noscript>
+      <p style="color: #fbfaf6; font-family: monospace; padding: 2rem">
+        Year in AI 2026 is a real-time 3D experience and needs JavaScript.
+      </p>
+    </noscript>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
